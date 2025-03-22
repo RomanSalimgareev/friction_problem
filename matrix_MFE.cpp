@@ -1,5 +1,42 @@
 #include "matrix_MFE.h"
 
+// Input material properties manually
+void setMaterialProperties(FiniteElement& finiteElement)
+{
+	std::cout << "Input modulus elastic: " << "\n";
+	std::cin >> finiteElement.modulusElastic;
+
+	std::cout << "Input coefficient Puasson: " << "\n";
+	std::cin >> finiteElement.poissonRatio;
+
+	std::cout << "Input dencity: " << "\n";
+	std::cin >> finiteElement.dencity;
+
+	std::cout << "Input length final element: " << "\n";
+	std::cin >> finiteElement.length;
+
+	std::cout << "Input width final element: " << "\n";
+	std::cin >> finiteElement.width;
+
+	std::cout << "Input heigth final element: " << "\n";
+	std::cin >> finiteElement.heigth;
+}
+
+// The choice of setting material properties: by default or manually
+void chooseMaterialProperties(FiniteElement& finiteElement)
+{
+	char choiceParameters = 'n';
+	std::cout << "Do you want to enter the parameters manually? (y/n) \n";
+	std::cin >> choiceParameters;
+	if (choiceParameters == 'y' or choiceParameters == 'Y')
+		setMaterialProperties(finiteElement);
+	else
+		std::cout << "the parameters are selected by default: \n" <<
+		"modulus elastic = 7e10; \n" << "poisson's ratio = 0.33; \n" <<
+		"dencity = 2700.0; \n" << "length = 0.5; \n" << "width = 0.06; \n" <<
+		"heigth = 0.05; \n";
+}
+
 // The shape function
 Real shapeFunction(const Array3D& locPoint, const Array3D& quadPoint)
 {
@@ -56,7 +93,7 @@ RealMatrix getLocalCoordinate()
 // Its function creates a elastic constants matrix
 RealMatrix makeMatrixElConst(const UnsignedType& rows,
 	const UnsignedType& columns, const Real& modulusElastic,
-	const Real& coeffPuasson)
+	const Real& poissonRatio)
 {
 	RealMatrix matrix(rows, columns);
 	for (UnsignedType i = 0; i < rows; ++i)
@@ -66,19 +103,19 @@ RealMatrix makeMatrixElConst(const UnsignedType& rows,
 			if (i < 3)
 			{
 				if (i == j)
-					matrix[i][j] = modulusElastic * (1.0 - coeffPuasson) /
-					((1.0 + coeffPuasson) *
-						(1.0 - 2.0 * coeffPuasson));
+					matrix[i][j] = modulusElastic * (1.0 - poissonRatio) /
+					((1.0 + poissonRatio) *
+						(1.0 - 2.0 * poissonRatio));
 				else if (j < 3)
-					matrix[i][j] = modulusElastic * coeffPuasson /
-					((1.0 + coeffPuasson) *
-						(1.0 - 2.0 * coeffPuasson));
+					matrix[i][j] = modulusElastic * poissonRatio /
+					((1.0 + poissonRatio) *
+						(1.0 - 2.0 * poissonRatio));
 			}
 			else
 			{
 				if (i == j)
 					matrix[i][j] = modulusElastic /
-					(2.0 * (1.0 + coeffPuasson));
+					(2.0 * (1.0 + poissonRatio));
 			}
 		}
 	}
@@ -126,11 +163,15 @@ RealMatrix makeMatrixBtD(const RealMatrix& bTranspose,
 
 // This function creates a diagonal mass matrix.
 RealMatrix makeMatrixMassDiag(const UnsignedType& size,
-	const Real& dencity, const Real& length,
-	const Real& width, const Real& heigth)
+	const FiniteElement& finiteElement)
 {
 	RealMatrix matrix(size, size);
 	UnsignedType nNodes = size / 3;
+
+	const Real dencity = finiteElement.dencity;
+	const Real length = finiteElement.length;
+	const Real width = finiteElement.width;
+	const Real heigth = finiteElement.heigth;
 	Real mass = dencity * length * width * heigth;
 	for (UnsignedType i = 0; i < size; ++i)
 	{
@@ -141,15 +182,17 @@ RealMatrix makeMatrixMassDiag(const UnsignedType& size,
 
 // This function creates a joint mass matrix.
 RealMatrix makeMatrixMassJoint(const UnsignedType& size,
-	const Real& dencity, const Real& length, const Real& width,
-	const Real& heigth)
+	const FiniteElement& finiteElement)
 {
+	const Real length = finiteElement.length;
+	const Real width = finiteElement.width;
+	const Real heigth = finiteElement.heigth;
 	const Real detMatrixJacobian = length * width * heigth / 8.0;
 
 	RealMatrix locCoord = getLocalCoordinate();
-
 	const UnsignedType m = locCoord.sizeRows();
 
+	const Real dencity = finiteElement.dencity;
 	RealMatrix quadPoints = makeMatrixQuadPoints(m, 8, locCoord);
 	const UnsignedType n = quadPoints.sizeColumns();
 	RealMatrix matrixMass(size, size);
@@ -192,18 +235,20 @@ RealMatrix makeMatrixMassJoint(const UnsignedType& size,
 }
 
 // This function creates a matrix stiffness.
-RealMatrix makeMatrixStiffness(const Real& length,
-	const Real& width, const Real& heigth, const Real& modulusEl,
-	const Real& coeffPuasson)
+RealMatrix makeMatrixStiffness(const FiniteElement& finiteElement)
 {
+	const Real length = finiteElement.length;
+	const Real width = finiteElement.width;
+	const Real heigth = finiteElement.heigth;
 	const Real detMatrixJacobian = length * width * heigth / 8.0;
 
-	RealMatrix locCoord = getLocalCoordinate();
-
-	RealMatrix ElasticConst = makeMatrixElConst(6, 6, modulusEl,
-		coeffPuasson);
+	const Real modulusElastic = finiteElement.modulusElastic;
+	const Real poissonRatio = finiteElement.poissonRatio;
+	RealMatrix ElasticConst = makeMatrixElConst(6, 6, modulusElastic,
+		poissonRatio);
 	const UnsignedType rowsElastic = ElasticConst.sizeRows();
 
+	RealMatrix locCoord = getLocalCoordinate();
 	const UnsignedType rowsLocCord = locCoord.sizeRows();
 	RealMatrix quadPoints = 
 		makeMatrixQuadPoints(rowsLocCord, 8, locCoord);

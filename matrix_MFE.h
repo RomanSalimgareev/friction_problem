@@ -6,12 +6,40 @@
 #define MATRIX_MFE_H
 
 #include <array>
+#include <iostream>
+
 #include "class_Matrix.h"
 
 using Real = double;
 using UnsignedType = UnsignedType;
 using Array3D = std::array<Real, 3>;
 using RealMatrix = Matrix<Real>;
+
+// Finite element structure, default structure fields:
+// modulus of elasticity = 7e10;
+// poisson's ratio. = 0.33;
+// dencity = 2700.0;
+// length = 0.5
+// width = 0.06;
+// heigth = 0.05;
+struct FiniteElement
+{
+	// Material properties: modulus Elastic, Poisson's ratio, dencity
+	Real modulusElastic = 7e10;
+	Real poissonRatio = 0.33;
+	Real dencity = 2700.0;
+
+	// Dimensions of the final element
+	Real length = 0.5;
+	Real width = 0.06;
+	Real heigth = 0.05;
+};
+
+// Input material properties manually
+void setMaterialProperties(FiniteElement& finiteElement);
+
+// The choice of setting material properties: by default or manually
+void chooseMaterialProperties(FiniteElement& finiteElement);
 
 // This function gives a matrix of local coordinates for an 8 - 
 // node parallelepiped, where 1 row is the ksi coordinates,
@@ -46,7 +74,7 @@ Real dShapeFuncPsi(const Array3D& locCoord,
 // Its function creates a elastic constants matrix
 RealMatrix makeMatrixElConst(const UnsignedType& rows,
 	const UnsignedType& columns, const Real& modulusElastic,
-	const Real& coeffPuasson);
+	const Real& poissonRatio);
 
 // Its function creates a matrix of quadratic points
 RealMatrix makeMatrixQuadPoints(const UnsignedType& rows,
@@ -64,20 +92,16 @@ RealMatrix makeMatrixBtD(const RealMatrix& bTranspose,
 // Its function creates a diagonal mass matrix
 // size - this is the size of the stiffness matrix
 RealMatrix makeMatrixMassDiag(const UnsignedType& size,
-	const Real& dencity, const Real& length,
-	const Real& width, const Real& heigth);
+	const FiniteElement& finiteElement);
 
 // Its function creates a joint mass matrix
 // size - this is the size of the stiffness matrix
 RealMatrix makeMatrixMassJoint(const UnsignedType& size,
-	const Real& dencity, const Real& length, const Real& width,
-	const Real& heigth);
+	const FiniteElement& finiteElement);
 
 // Its function creates a stiffness matrix
 // modulusEl - modulus of elasticity of the material
 // coeffPuasson - coefficient Puasson
-RealMatrix makeMatrixStiffness(const Real& length,
-	const Real& width, const Real& heigth, const Real& modulusEl,
-	const Real& coeffPuasson);
+RealMatrix makeMatrixStiffness(const FiniteElement& finiteElement);
 
 #endif
