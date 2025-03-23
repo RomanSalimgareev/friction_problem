@@ -50,7 +50,7 @@ int main()
 			matrixStiffness, matrixMassDiag);
 
 	const UnsignedType rowsD = displacements.sizeRows();
-	writeDispAllNodes(rowsD, displacements);
+	writeDispSecondNode(rowsD, displacements);
 
 	UnsignedType steps = static_cast<UnsignedType> (time / deltaT);
 	writeStepsTime(steps, deltaT);

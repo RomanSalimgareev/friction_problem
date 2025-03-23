@@ -31,8 +31,8 @@ struct FiniteElement
 
 	// Dimensions of the final element
 	Real length = 0.5;
-	Real width = 0.06;
-	Real heigth = 0.05;
+	Real width = 0.3;
+	Real heigth = 0.2;
 };
 
 // Input material properties manually

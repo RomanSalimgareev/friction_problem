@@ -32,9 +32,12 @@ void chooseMaterialProperties(FiniteElement& finiteElement)
 		setMaterialProperties(finiteElement);
 	else
 		std::cout << "the parameters are selected by default: \n" <<
-		"modulus elastic = 7e10; \n" << "poisson's ratio = 0.33; \n" <<
-		"dencity = 2700.0; \n" << "length = 0.5; \n" << "width = 0.06; \n" <<
-		"heigth = 0.05; \n";
+		"modulus elastic = " << finiteElement.modulusElastic << "; \n" <<
+		"poisson's ratio = " << finiteElement.poissonRatio << "; \n" <<
+		"dencity = " << finiteElement.dencity << "; \n" <<
+		"length = " << finiteElement.length << "; \n" <<
+		"width = " << finiteElement.width << "; \n" <<
+		"heigth = " << finiteElement.heigth << "; \n";
 }
 
 // The shape function
