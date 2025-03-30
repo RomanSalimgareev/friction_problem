@@ -7,6 +7,9 @@
 #define CLASS_MATRIX_H
 
 #include <vector>
+#include <string>
+
+#include "error_handling.h"
 
 using UnsignedType = size_t;
 

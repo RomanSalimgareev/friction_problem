@@ -44,6 +44,14 @@ UnsignedType Matrix<T>::sizeColumns() const
 template <typename T>
 void Matrix<T>::eraseRowMatrix(const UnsignedType& i)
 {
+	if (i >= m_matrix.size())
+	{
+		std::string msg = "Going outside the array. Location of the error: ";
+		msg += std::string(__FILE__) + "\n";
+		log(LogLevel::ERROR, msg);
+		throw std::out_of_range(msg);
+	}
+
 	m_matrix.erase(m_matrix.begin() + i);
 }
 

@@ -6,12 +6,12 @@ template <typename T>
 std::ostream& operator << (const Matrix<T>& matrix,
 	std::ostream& out)
 {
-	const UnsignedType r = matrix.sizeRows();
-	const UnsignedType c = matrix.sizeColumns();
+	const UnsignedType rows = matrix.sizeRows();
+	const UnsignedType columns = matrix.sizeColumns();
 
-	for (UnsignedType i = 0; i < r; ++i)
+	for (UnsignedType i = 0; i < rows; ++i)
 	{
-		for (UnsignedType j = 0; j < c; ++j)
+		for (UnsignedType j = 0; j < columns; ++j)
 		{
 			std::cout << matrix[i][j] << " ";
 		}
@@ -24,9 +24,9 @@ template <typename T>
 std::ostream& operator << (const std::vector<T>& vectorOutput,
 	std::ostream& out)
 {
-	const UnsignedType r = vectorOutput.size();
+	const UnsignedType rows = vectorOutput.size();
 
-	for (UnsignedType i = 0; i < r; ++i)
+	for (UnsignedType i = 0; i < rows; ++i)
 	{
 		std::cout << vectorOutput[i] << " ";
 	}
@@ -62,8 +62,17 @@ RealVector operator* (const RealVector& vec,
 RealVector& operator+= (RealVector& vectorFirst,
 	const RealVector& vectorSecond)
 {
-	const UnsignedType s = vectorFirst.size();
-	for (UnsignedType i = 0; i < s; ++i)
+	const UnsignedType sizeSecond = vectorSecond.size();
+	if (vectorFirst.size() < sizeSecond)
+	{
+		std::string msg = "Going outside the array, the size of the second "
+			"vector is larger than the first.";
+		msg += std::string(__FILE__) + "\n";
+		log(LogLevel::ERROR, msg);
+		throw std::out_of_range(msg);
+	}
+
+	for (UnsignedType i = 0; i < sizeSecond; ++i)
 	{
 		vectorFirst[i] += vectorSecond[i];
 	}
@@ -74,8 +83,17 @@ RealVector operator+ (const RealVector& vectorFirst,
 	const RealVector& vectorSecond)
 {
 	RealVector result = vectorFirst;
-	const UnsignedType s = vectorFirst.size();
-	for (UnsignedType i = 0; i < s; ++i)
+	const UnsignedType sizeSecond = vectorSecond.size();
+	if (vectorFirst.size() < sizeSecond)
+	{
+		std::string msg = "Going outside the array, the size of the second "
+			"vector is larger than the first.";
+		msg += std::string(__FILE__) + "\n";
+		log(LogLevel::ERROR, msg);
+		throw std::out_of_range(msg);
+	}
+
+	for (UnsignedType i = 0; i < sizeSecond; ++i)
 	{
 		result[i] += vectorSecond[i];
 	}
@@ -86,8 +104,17 @@ RealVector operator- (const RealVector& vectorFirst,
 	const RealVector& vectorSecond)
 {
 	RealVector result = vectorFirst;
-	const UnsignedType s = vectorFirst.size();
-	for (UnsignedType i = 0; i < s; ++i)
+	const UnsignedType sizeSecond = vectorSecond.size();
+	if (vectorFirst.size() < sizeSecond)
+	{
+		std::string msg = "Going outside the array, the size of the second "
+			"vector is larger than the first.";
+		msg += std::string(__FILE__) + "\n";
+		log(LogLevel::ERROR, msg);
+		throw std::out_of_range(msg);
+	}
+
+	for (UnsignedType i = 0; i < sizeSecond; ++i)
 	{
 		result[i] -= vectorSecond[i];
 	}
@@ -97,13 +124,13 @@ RealVector operator- (const RealVector& vectorFirst,
 RealVector operator* (const RealMatrix& matrix,
 	const RealVector& vec)
 {
-	const UnsignedType r = matrix.sizeRows();
-	const UnsignedType c = matrix.sizeColumns();
-	std::vector <Real> product(r);
+	const UnsignedType rows = matrix.sizeRows();
+	const UnsignedType columns = matrix.sizeColumns();
+	std::vector <Real> product(rows);
 
-	for (UnsignedType i = 0; i < r; ++i)
+	for (UnsignedType i = 0; i < rows; ++i)
 	{
-		for (UnsignedType j = 0; j < c; ++j)
+		for (UnsignedType j = 0; j < columns; ++j)
 		{
 			product[i] += matrix[i][j] * vec[j];
 		}
@@ -114,13 +141,13 @@ RealVector operator* (const RealMatrix& matrix,
 RealVector operator* (const RealVector& vec,
 	const RealMatrix& matrix)
 {
-	const UnsignedType r = matrix.sizeRows();
-	const UnsignedType c = matrix.sizeColumns();
-	std::vector <Real> product(r);
+	const UnsignedType rows = matrix.sizeRows();
+	const UnsignedType columns = matrix.sizeColumns();
+	std::vector <Real> product(rows);
 
-	for (UnsignedType i = 0; i < r; ++i)
+	for (UnsignedType i = 0; i < rows; ++i)
 	{
-		for (UnsignedType j = 0; j < c; ++j)
+		for (UnsignedType j = 0; j < columns; ++j)
 		{
 			product[i] += matrix[i][j] * vec[j];
 		}
@@ -132,8 +159,16 @@ Real operator* (const RealVector& vectorFirst,
 	const RealVector& vectorSecond)
 {
 	Real product = 0;
-	const UnsignedType s = vectorFirst.size();
-	for (UnsignedType i = 0; i < s; ++i)
+	const UnsignedType sizeSecond = vectorSecond.size();
+	if (vectorFirst.size() != sizeSecond)
+	{
+		std::string msg = "Going outside the array, the size of the second "
+			"vector is not equal to the size of the first one.";
+		msg += std::string(__FILE__) + "\n";
+		log(LogLevel::ERROR, msg);
+		throw std::out_of_range(msg);
+	}
+	for (UnsignedType i = 0; i < sizeSecond; ++i)
 	{
 		product += vectorFirst[i] * vectorSecond[i];
 	}
@@ -180,12 +215,22 @@ RealMatrix operator+ (const RealMatrix& matrixFirst,
 	const RealMatrix& matrixSecond)
 {
 	RealMatrix result = matrixFirst;
-	const UnsignedType r = matrixFirst.sizeRows();
-	const UnsignedType c = matrixFirst.sizeColumns();
+	const UnsignedType rows = matrixFirst.sizeRows();
+	const UnsignedType columns = matrixFirst.sizeColumns();
 
-	for (UnsignedType i = 0; i < r; ++i)
+	if (matrixSecond.sizeRows() != rows and
+		matrixSecond.sizeColumns() != columns)
 	{
-		for (UnsignedType j = 0; j < c; ++j)
+		std::string msg = "Going outside the array, "
+			"the sizes of the matrices are not equal.";
+		msg += std::string(__FILE__) + "\n";
+		log(LogLevel::ERROR, msg);
+		throw std::out_of_range(msg);
+	}
+
+	for (UnsignedType i = 0; i < rows; ++i)
+	{
+		for (UnsignedType j = 0; j < columns; ++j)
 		{
 			result[i][j] += matrixSecond[i][j];
 		}
@@ -198,12 +243,22 @@ RealMatrix operator- (const RealMatrix& matrixFirst,
 	const RealMatrix& matrixSecond)
 {
 	RealMatrix result = matrixFirst;
-	const UnsignedType r = matrixFirst.sizeRows();
-	const UnsignedType c = matrixFirst.sizeColumns();
+	const UnsignedType rows = matrixFirst.sizeRows();
+	const UnsignedType columns = matrixFirst.sizeColumns();
 
-	for (UnsignedType i = 0; i < r; ++i)
+	if (matrixSecond.sizeRows() != rows and
+		matrixSecond.sizeColumns() != columns)
 	{
-		for (UnsignedType j = 0; j < c; ++j)
+		std::string msg = "Going outside the array, "
+			"the sizes of the matrices are not equal.";
+		msg += std::string(__FILE__) + "\n";
+		log(LogLevel::ERROR, msg);
+		throw std::out_of_range(msg);
+	}
+
+	for (UnsignedType i = 0; i < rows; ++i)
+	{
+		for (UnsignedType j = 0; j < columns; ++j)
 		{
 			result[i][j] -= matrixSecond[i][j];
 		}

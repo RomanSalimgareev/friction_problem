@@ -1,62 +1,146 @@
 #include "write_function.h"
 
-void writeDispAllNodes(const UnsignedType& rows,
-	const Matrix<Real>& displacements)
+void checkFileOpen(std::ofstream& fout, bool& isWrite)
 {
+	if (fout.is_open() == false)
+	{
+		std::string msg = "The file was not opened. Location of the warning: ";
+		msg += std::string(__FILE__) + "\n";
+		log(LogLevel::WARNING, msg);
+		isWrite = false;
+	}
+	std::cout << "File is not open. \n";
+}
+
+bool writeDispAllNodes(const Matrix<Real>& displacements)
+{
+	bool isWrite = true;
 	std::ofstream fout("displacements.txt");
+	checkFileOpen(fout, isWrite);
+
+	const UnsignedType rows = displacements.sizeRows();
 	for (UnsignedType i = 0; i < rows; ++i)
 	{
-		fout << "1: " << displacements[i][0] << "  " << "2: " << "  " <<
-		displacements[i][1] << "  " << "5: " <<  displacements[i][4] <<
-		"  " << "6: " << displacements[i][6] << "\n";
+		if (displacements[i].size() >= 7)
+		{
+			fout << "1: " << displacements[i][0] << "  " << "2: " << "  " <<
+				displacements[i][1] << "  " << "5: " << displacements[i][4] <<
+				"  " << "6: " << displacements[i][6] << "\n";
+		}
+		else
+		{
+			isWrite = false;
+			break;
+		}
 	}
 	fout.close();
+
+	return isWrite;
 }
 
-void writeDispFirstNode(const UnsignedType& rows,
-	const Matrix<Real>& displacements)
+bool writeDispFirstNode(const Matrix<Real>& displacements)
 {
+	bool isWrite = true;
 	std::ofstream fout("displacements.txt");
+	checkFileOpen(fout, isWrite);
+
+	const UnsignedType rows = displacements.sizeRows();
 	for (UnsignedType i = 0; i < rows; ++i)
-		fout << displacements[i][0] << "\n";
+	{
+		if (displacements[i].size() >= 1)
+			fout << displacements[i][0] << "\n";
+		else
+		{
+			isWrite = false;
+			break;
+		}
+	}
 
 	fout.close();
+
+	return isWrite;
 }
 
-void writeDispSecondNode(const UnsignedType& rows,
-	const Matrix<Real>& displacements)
+bool writeDispSecondNode(const Matrix<Real>& displacements)
 {
+	bool isWrite = true;
 	std::ofstream fout("displacements.txt");
+	checkFileOpen(fout, isWrite);
+
+	const UnsignedType rows = displacements.sizeRows();
 	for (UnsignedType i = 0; i < rows; ++i)
-		fout << displacements[i][1] << "\n";
+	{
+		if (displacements[i].size() >= 2)
+			fout << displacements[i][1] << "\n";
+		else
+		{
+			isWrite = false;
+			break;
+		}
+	}
 
 	fout.close();
+	
+	return isWrite;
 }
-void writeDispFifthNode(const UnsignedType& rows,
-	const Matrix<Real>& displacements)
+
+bool writeDispFifthNode(const Matrix<Real>& displacements)
 {
+	bool isWrite = true;
 	std::ofstream fout("displacements.txt");
+	checkFileOpen(fout, isWrite);
+
+	const UnsignedType rows = displacements.sizeRows();
 	for (UnsignedType i = 0; i < rows; ++i)
-		fout << displacements[i][4] << "\n";
+	{
+		if (displacements[i].size() >= 5)
+			fout << displacements[i][4] << "\n";
+		else
+		{
+			isWrite = false;
+			break;
+		}
+	}
 
 	fout.close();
+
+	return isWrite;
 }
-void writeDispSixthNode(const UnsignedType& rows,
-	const Matrix<Real>& displacements)
+
+bool writeDispSixthNode(const Matrix<Real>& displacements)
 {
+	bool isWrite = true;
 	std::ofstream fout("displacements.txt");
+	checkFileOpen(fout, isWrite);
+
+	const UnsignedType rows = displacements.sizeRows();
 	for (UnsignedType i = 0; i < rows; ++i)
-		fout << displacements[i][06] << "\n";
+	{
+		if (displacements[i].size() >= 7)
+			fout << displacements[i][6] << "\n";
+		else
+		{
+			isWrite = false;
+			break;
+		}
+	}
 
 	fout.close();
+
+	return isWrite;
 }
 
-void writeStepsTime(const UnsignedType& steps, const Real& deltaT)
+bool writeStepsTime(const UnsignedType& steps, const Real& deltaT)
 {
-	std::ofstream fout("stepsTime.txt");
+	bool isWrite = true;
+	std::ofstream fout("displacements.txt");
+	checkFileOpen(fout, isWrite);
+
 	for (UnsignedType i = 0; i < steps; ++i)
 	{
 		fout << deltaT * i << "\n";
 	}
 	fout.close();
+
+	return isWrite;
 }

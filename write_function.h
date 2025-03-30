@@ -17,31 +17,26 @@ using UnsignedType = UnsignedType;
 // movement in a time step deltaT during time time.
 // rows is the number of rows of the displacement matrix, and displacements is
 // the displacement matrix.
-void writeDispAllNodes(const UnsignedType& rows,
-	const Matrix<Real>& displacements);
+bool writeDispAllNodes(const Matrix<Real>& displacements);
 
 // Writing to the file the movements of node 1 in the direction of movement 
 // in a time step deltaT during time time.
-void writeDispFirstNode(const UnsignedType& rows,
-	const Matrix<Real>& displacements);
+bool writeDispFirstNode(const Matrix<Real>& displacements);
 
 // Writing to the file the movements of node 2 in the direction of movement 
 // in a time step deltaT during time time.
-void writeDispSecondNode(const UnsignedType& rows,
-	const Matrix<Real>& displacements);
+bool writeDispSecondNode(const Matrix<Real>& displacements);
 
 // Writing to the file the movements of node 5 in the direction of movement 
 // in a time step deltaT during time time.
-void writeDispFifthNode(const UnsignedType& rows,
-	const Matrix<Real>& displacements);
+bool writeDispFifthNode(const Matrix<Real>& displacements);
 
 // Writing to the file the movements of node 6 in the direction of movement 
 // in a time step deltaT during time time.
-void writeDispSixthNode(const UnsignedType& rows,
-	const Matrix<Real>& displacements);
+bool writeDispSixthNode(const Matrix<Real>& displacements);
 
 // Writing deltaT time steps to the file during the time period.
 // steps = time / deltaT
-void writeStepsTime(const UnsignedType& steps, const Real& deltaT);
+bool writeStepsTime(const UnsignedType& steps, const Real& deltaT);
 
 #endif
