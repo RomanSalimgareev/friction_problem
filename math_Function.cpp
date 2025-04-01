@@ -1,43 +1,56 @@
 #include "math_Function.h"
 
 // Matrix Cholesky
-RealMatrix createMatrixCholesky(const RealMatrix& matrix)
+RealMatrix createMatrixCholesky(const RealMatrix& matrixStiffness)
 {
-	UnsignedType n = matrix.sizeRows();
-	RealMatrix L(n, n);
+	UnsignedType rowsStiffness = matrixStiffness.sizeRows();
+	if (rowsStiffness != matrixStiffness.sizeColumns())
+	{
+		std::string msg = "The stiffness matrix is not square. ";
+		ASSERT(rowsStiffness == matrixStiffness.sizeColumns(), msg);
 
-	for (UnsignedType i = 0; i < n; ++i) {
+		msg += std::string(__FILE__) + "\n";
+		log(LogLevel::ERROR, msg);
+		throw std::runtime_error(msg);
+	}
+
+	RealMatrix matrixCholesky(rowsStiffness, rowsStiffness);
+
+	for (UnsignedType i = 0; i < rowsStiffness; ++i) {
 		for (UnsignedType j = 0; j <= i; ++j) {
 			Real sum = 0;
 			if (j == i) {
 				for (UnsignedType k = 0; k < j; ++k) {
-					sum += pow(L[j][k], 2);
+					sum += pow(matrixCholesky[j][k], 2);
 				}
-				L[j][j] = sqrt(matrix[j][j] - sum);
+				matrixCholesky[j][j] = sqrt(matrixStiffness[j][j] - sum);
 			}
 			else {
-				for (UnsignedType k = 0; k < j; ++k) {
-					sum += (L[i][k] * L[j][k]);
-				}
-				L[i][j] = (matrix[i][j] - sum) / L[j][j];
+				for (UnsignedType k = 0; k < j; ++k)
+					sum += (matrixCholesky[i][k] * matrixCholesky[j][k]);
+
+				if (matrixCholesky[j][j] <= DBL_EPSILON)
+					ERROR_DIVIDE_ZERO();
+
+				matrixCholesky[i][j] = 
+					(matrixStiffness[i][j] - sum) / matrixCholesky[j][j];
 			}
 		}
 	}
 
-	return L;
+	return matrixCholesky;
 }
 
 // Transpose matrix
-template <typename T>
-Matrix<T> transpose(const Matrix<T>& noTranspose)
+RealMatrix transpose(const RealMatrix& noTranspose)
 {
-	UnsignedType r = noTranspose.sizeRows();
-	UnsignedType c = noTranspose.sizeColumns();
+	UnsignedType rows = noTranspose.sizeRows();
+	UnsignedType columns = noTranspose.sizeColumns();
 
-	Matrix<T> new_matrix(c, r);
-	for (UnsignedType i = 0; i < c; ++i)
+	RealMatrix new_matrix(columns, rows);
+	for (UnsignedType i = 0; i < columns; ++i)
 	{
-		for (UnsignedType j = 0; j < r; ++j)
+		for (UnsignedType j = 0; j < rows; ++j)
 		{
 			new_matrix[i][j] = noTranspose[j][i];
 		}
@@ -48,18 +61,28 @@ Matrix<T> transpose(const Matrix<T>& noTranspose)
 // Solving a system of linear equations by the Gauss method with
 // the choice of a leading element
 RealVector solveGauss(const RealMatrix& matrixCoefficients,
-	const RealVector& columnsFreeMembers)
+	const RealVector& columnFreeMembers)
 {
-	const UnsignedType r = matrixCoefficients.sizeRows();
-	const UnsignedType c = matrixCoefficients.sizeColumns();
+	const UnsignedType rows = matrixCoefficients.sizeRows();
+	const UnsignedType columns = matrixCoefficients.sizeColumns();
 	RealMatrix A = matrixCoefficients;
-	RealVector B = columnsFreeMembers;
-	RealVector result(r);
+	RealVector B = columnFreeMembers;
+	RealVector result(rows, 0.0);
+	if (rows != columnFreeMembers.size())
+	{
+		std::string msg = "The size of the column of free terms does \n"
+			"not match the number of rows in the coefficient matrix. ";
+		ASSERT(rows == columnFreeMembers.size(), msg);
 
-	for (UnsignedType i = 0; i < c; ++i)
+		msg += std::string(__FILE__) + "\n";
+		log(LogLevel::ERROR, msg);
+		throw std::runtime_error(msg);
+	}
+
+	for (UnsignedType i = 0; i < columns; ++i)
 	{
 		UnsignedType maxIndex = i;
-		for (UnsignedType j = i; j < r; ++j)
+		for (UnsignedType j = i; j < rows; ++j)
 		{
 			if (abs(A[j][i]) > abs(A[maxIndex][i]))
 			{
@@ -70,15 +93,18 @@ RealVector solveGauss(const RealMatrix& matrixCoefficients,
 		std::swap(A[i], A[maxIndex]);
 		std::swap(B[i], B[maxIndex]);
 
-		for (UnsignedType k = i; k < r; ++k)
+		for (UnsignedType k = i; k < rows; ++k)
 		{
 			Real firstCoefficient = A[k][i];
+			if (firstCoefficient <= DBL_EPSILON)
+				ERROR_DIVIDE_ZERO();
+
 			if (k == i)
 				B[k] = B[k] / firstCoefficient;
 			else
 				B[k] -= B[i] * firstCoefficient;
 
-			for (UnsignedType m = i; m < c; ++m)
+			for (UnsignedType m = i; m < columns; ++m)
 			{
 				if (k == i)
 					A[k][m] = A[k][m] / firstCoefficient;
@@ -88,10 +114,10 @@ RealVector solveGauss(const RealMatrix& matrixCoefficients,
 		}
 	}
 
-	for (UnsignedType i = r; i-- > 0; )
+	for (UnsignedType i = rows; i-- > 0; )
 	{
 		Real sum = 0;
-		for (UnsignedType j = i + 1; j < r; ++j)
+		for (UnsignedType j = i + 1; j < rows; ++j)
 		{
 			sum += result[j] * A[i][j];
 		}

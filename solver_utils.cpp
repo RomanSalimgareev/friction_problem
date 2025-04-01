@@ -32,12 +32,24 @@ Real getAmplitudeForce(const bool& isDriveForceDry)
 Real getAveragePointsSpeed(RealVector speed)
 {
 	UnsignedType sizeIndices = ACTIVE_INDICES.size();
-	Real sizeCast = static_cast<Real> (sizeIndices);
-	Real sumSpeed = 0.0;
-	for (auto index : ACTIVE_INDICES)
-		sumSpeed += speed[index];
+	if (sizeIndices == 0)
+		ERROR_SIZE_ACTIVE_INDICES_ZERO();
 
-	Real averagePointsSpeed = sumSpeed / sizeCast;
+	const UnsignedType sizeSpeed = speed.size();
+	Real sumSpeed = 0.0;
+	for (const auto& index : ACTIVE_INDICES)
+	{
+		if (index < sizeSpeed)
+			sumSpeed += speed[index];
+		else
+		{
+			ASSERT(index < sizeSpeed, "The index goes beyond the array. ");
+			WARNING_INDEX_OUT_OF_RANGE();
+			continue;
+		}
+	}
+
+	Real averagePointsSpeed = sumSpeed / static_cast<Real> (sizeIndices);
 
 	return averagePointsSpeed;
 }
@@ -57,10 +69,19 @@ Real getCoeffDryFriction(const Real& coeffDryFrictionRest,
 Real getElasticForce(const RealVector& displacement,
 	const RealMatrix& matrixStiffness)
 {
-	UnsignedType qualityValues = matrixStiffness[0].size();
+	const UnsignedType qualityValues = matrixStiffness[0].size();
 	RealVector sumVectorStiffness(qualityValues, 0.0);
 	for (const auto& index : ACTIVE_INDICES)
-		sumVectorStiffness += matrixStiffness[index];
+	{
+		if (index < qualityValues)
+			sumVectorStiffness += matrixStiffness[index];
+		else
+		{
+			ASSERT(index < qualityValues, "The index goes beyond the array. ");
+			WARNING_INDEX_OUT_OF_RANGE();
+			continue;
+		}
+	}
 
 	Real elasticForce = -1.0 * displacement * sumVectorStiffness;
 
@@ -122,9 +143,10 @@ UnsignedType getFrictionMode()
 Real getNodeLoad(const Real& amplitudeForce)
 {
 	UnsignedType sizeIndices = ACTIVE_INDICES.size();
-	Real sizeCast = static_cast<Real>(sizeIndices);
+	if (sizeIndices == 0)
+		ERROR_SIZE_ACTIVE_INDICES_ZERO();
 
-	return amplitudeForce / sizeIndices;
+	return amplitudeForce / static_cast<Real>(sizeIndices);
 }
 
 Real getNormReaction(const bool& isDriveForce)
@@ -204,9 +226,19 @@ Real getSignFrictionFree(const Real& elasticForce,
 
 Real getSumFrictionForce(const RealVector& force)
 {
+	const UnsignedType sizeForce = force.size();
 	Real sumForce = 0.0;
 	for (const auto& index : ACTIVE_INDICES)
-		sumForce += force[index];
+	{
+		if (index < sizeForce)
+			sumForce += force[index];
+		else
+		{
+			ASSERT(index < sizeForce, "The index goes beyond the array. ");
+			WARNING_INDEX_OUT_OF_RANGE();
+			continue;
+		}
+	}
 
 	return sumForce;
 }
@@ -220,9 +252,18 @@ void setForceNormReaction(RealVector& force,
 
 	std::vector<UnsignedType> indexsNormalReaction =
 	{ 4, 7, 14, 16, 17, 19, 20, 23 };
-
+	const UnsignedType sizeForce = force.size();
 	for (auto index : indexsNormalReaction)
-		force[index] = -1.0 * normalReaction;
+	{
+		if (index < sizeForce)
+			force[index] = -1.0 * normalReaction;
+		else
+		{
+			ASSERT(index < sizeForce, "The index goes beyond the array. ");
+			WARNING_INDEX_OUT_OF_RANGE();
+			continue;
+		}
+	}
 }
 
 void setForceDry(const Real& elasticForce,
@@ -236,12 +277,22 @@ void setForceDry(const Real& elasticForce,
 		getCoeffDryFriction(coeffDryFrictionRest, coeffDryFrictionSliding,
 			averagePointsSpeed);
 
+	const UnsignedType sizeForce = force.size();
 	for (const auto& index : ACTIVE_INDICES)
 	{
-		if (index == 1 or index == 4)
-			force[index] = signForce * coeffDryFriction * normalReaction;
-		else if (index == 6)
-			force[index] = 2.0 * signForce * coeffDryFriction * normalReaction;
+		if (index < sizeForce)
+		{
+			if (index == 1 or index == 4)
+				force[index] = signForce * coeffDryFriction * normalReaction;
+			else if (index == 6)
+				force[index] = 2.0 * signForce * coeffDryFriction * normalReaction;
+		}
+		else
+		{
+			ASSERT(index < sizeForce, "The index goes beyond the array. ");
+			WARNING_INDEX_OUT_OF_RANGE();
+			continue;
+		}
 	}
 }
 
@@ -255,24 +306,44 @@ void setForceDriveDry(const Real& signForce,
 		getCoeffDryFriction(coeffDryFrictionRest, coeffDryFrictionSliding,
 			averagePointsSpeed);
 
+	const UnsignedType sizeForce = force.size();
 	for (const auto& index : ACTIVE_INDICES)
 	{
-		if (index == 0)
-			force[index] = driveForceNode;
-		else if (index == 1 or index == 4)
-			force[index] = signForce * coeffDryFriction * normalReaction +
-			driveForceNode;
+		if (index < sizeForce)
+		{
+			if (index == 0)
+				force[index] = driveForceNode;
+			else if (index == 1 or index == 4)
+				force[index] = signForce * coeffDryFriction * normalReaction +
+				driveForceNode;
+			else
+				force[index] = 2.0 * signForce * coeffDryFriction * normalReaction +
+				driveForceNode;
+		}
 		else
-			force[index] = 2.0 * signForce * coeffDryFriction * normalReaction +
-			driveForceNode;
+		{
+			ASSERT(index < sizeForce, "The index goes beyond the array. ");
+			WARNING_INDEX_OUT_OF_RANGE();
+			continue;
+		}
 	}
 }
 
 void setForceViscous(const Real& nodeLoad, const Real& frequency,
 	const Real& sumSteps, RealVector& force)
 {
+	const UnsignedType sizeForce = force.size();
 	for (const auto& index : ACTIVE_INDICES)
-		force[index] = nodeLoad * cos(frequency * sumSteps);
+	{
+		if (index < sizeForce)
+			force[index] = nodeLoad * cos(frequency * sumSteps);
+		else
+		{
+			ASSERT(index < sizeForce, "The index goes beyond the array. ");
+			WARNING_INDEX_OUT_OF_RANGE();
+			continue;
+		}
+	}
 }
 
 

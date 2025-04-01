@@ -11,14 +11,16 @@
 #include "class_Matrix.h"
 #include "math_Function.h"
 
+// It is not recommended to change to zero value.
 constexpr Real STATIC_SIMMETRY = 10.0e10;
+// It is not recommended to change the size of the array to zero
 constexpr std::array<UnsignedType, 4> INDICES_INITIAL = {0, 3, 12, 15};
 
 // Everywhere "size" is the row size of the stiffness matrix.
 
 // The function of setting a static load to solve a static problem.
 // P.S. : for my task the force is 10000
-RealVector makeStaticForce
+RealVector makeInitialStaticForce
 (const Real& initialForce, const UnsignedType& size);
 
 // The function of setting initial displacements by finding displacements from

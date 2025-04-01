@@ -1,15 +1,26 @@
 #include "initial_conditions.h"
 
-RealVector makeStaticForce(const Real& initialForce,
+RealVector makeInitialStaticForce(const Real& initialForce,
 	const UnsignedType& size)
 {
 	RealVector vectorInitial(size, 0.0);
-	// Øndices of the action of static forces 
+	// Indices of the action of static forces 
 	UnsignedType sizeIndices = INDICES_INITIAL.size();
-	Real sizeCast = static_cast<Real> (sizeIndices);
-	Real nodeLoad = initialForce / sizeCast;
+	if (sizeIndices == 0)
+		ERROR_SIZE_INDICES_INITIAL_ZERO();
+
+	Real nodeLoad = initialForce / static_cast<Real> (sizeIndices);
 	for (auto index : INDICES_INITIAL)
-		vectorInitial[index] = nodeLoad;
+	{
+		if (index < size)
+			vectorInitial[index] = nodeLoad;
+		else
+		{
+			ASSERT(index < size, "The index goes beyond the array. ");
+			WARNING_INDEX_OUT_OF_RANGE();
+			continue;
+		}
+	}
 
 	return vectorInitial;
 }
@@ -37,7 +48,7 @@ RealVector makeInitialDisps
 		if (force != 0.0)
 		{
 			RealVector initialForceStatic =
-				makeStaticForce(force, size);
+				makeInitialStaticForce(force, size);
 			// Solution for static problem
 			vectorInitial = 
 				calculateDispStatic(matrixStiffness, initialForceStatic);
@@ -56,8 +67,17 @@ RealVector makeInitialSpeed(const UnsignedType& size)
 
 	if (speed != 0.0)
 	{
-		for (auto i : INDICES_INITIAL)
-			vectorInitial[i] = speed;
+		for (auto index : INDICES_INITIAL)
+		{
+			if (index < size)
+				vectorInitial[index] = speed;
+			else
+			{
+				ASSERT(index < size, "The index goes beyond the array. ");
+				WARNING_INDEX_OUT_OF_RANGE();
+				continue;
+			}
+		}
 	}
 
 	return vectorInitial;
@@ -72,8 +92,17 @@ RealVector makeInitialAccel(const UnsignedType& size)
 
 	if (acceleration != 0.0)
 	{
-		for (auto i : INDICES_INITIAL)
-			vectorInitial[i] = acceleration;
+		for (auto index : INDICES_INITIAL)
+		{
+			if (index < size)
+				vectorInitial[index] = acceleration;
+			else
+			{
+				ASSERT(index < size, "The index goes beyond the array. ");
+				WARNING_INDEX_OUT_OF_RANGE();
+				continue;
+			}
+		}
 	}
 
 	return vectorInitial;
@@ -82,14 +111,20 @@ RealVector makeInitialAccel(const UnsignedType& size)
 // Applying symmetry conditions to symmetry nodes for a static problem
 void boundConditionStatic(RealMatrix& matrixStiffness)
 {
-	std::vector<UnsignedType> indexs =
+	const std::vector<UnsignedType> indexs =
 	{ 1, 2, 5, 6, 8, 9, 10, 11, 13, 18, 21, 22 };
-	for (auto i : indexs)
+	for (const auto& index : indexs)
 	{
-		if (matrixStiffness[i][i] == 0.0)
-			matrixStiffness[i][i] = STATIC_SIMMETRY;
+		bool isOutOfRange = index >= matrixStiffness.sizeRows() or
+			index >= matrixStiffness.sizeColumns();
+		if (isOutOfRange)
+		{
+			ASSERT(isOutOfRange, "The index goes beyond the array. ");
+			WARNING_INDEX_OUT_OF_RANGE();
+			continue;
+		}
 		else
-			matrixStiffness[i][i] *= STATIC_SIMMETRY;
+			matrixStiffness[index][index] *= STATIC_SIMMETRY;
 	}
 }
 
@@ -98,8 +133,17 @@ RealVector calculateDispStatic
 (const RealMatrix& matrixStiffness, const RealVector& force)
 {
 	const UnsignedType rows = matrixStiffness.sizeRows();
-	RealVector interimSolution(rows);
+	RealVector interimSolution(rows, 0.0);
 	RealMatrix matrixCholesky = createMatrixCholesky(matrixStiffness);
+	if (force.size() < rows)
+	{
+		std::string msg = "The size of the force vector is smaller than \n"
+			"the rows of the stiffness matrix. ";
+		msg += std::string(__FILE__) + "\n";
+		log(LogLevel::ERROR, msg);
+		throw std::runtime_error(msg);
+	}
+
 	for (UnsignedType i = 0; i < rows; ++i)
 	{
 		Real sum = 0.0;
@@ -107,10 +151,14 @@ RealVector calculateDispStatic
 		{
 			sum += matrixCholesky[i][j] * interimSolution[j];
 		}
+
+		if (matrixCholesky[i][i] <= DBL_EPSILON)
+			ERROR_DIVIDE_ZERO();
+
 		interimSolution[i] = (force[i] - sum) / matrixCholesky[i][i];
 	}
 
-	RealVector displacements(rows);
+	RealVector displacements(rows, 0.0);
 
 	UnsignedType i = rows;
 	while (i > 0)
@@ -122,6 +170,10 @@ RealVector calculateDispStatic
 		{
 			sum += matrixCholesky[j][i] * displacements[j];
 		}
+
+		if (matrixCholesky[i][i] <= DBL_EPSILON)
+			ERROR_DIVIDE_ZERO();
+
 		displacements[i] = (interimSolution[i] - sum) / matrixCholesky[i][i];
 	}
 	return displacements;

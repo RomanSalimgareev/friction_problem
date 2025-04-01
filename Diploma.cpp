@@ -34,6 +34,13 @@ int main()
 	FiniteElement finiteElement;
 	chooseMaterialProperties(finiteElement);
 
+	// As well as the oscillation time and time step (for numerical integration)
+	Real time = 2.0;
+	// Up to 1e-14
+	Real deltaT = 1.0e-6;
+
+	try
+	{
 	// Matrix stiffness
 	RealMatrix matrixStiffness = makeMatrixStiffness(finiteElement);
 
@@ -42,15 +49,18 @@ int main()
 	RealMatrix matrixMassDiag = 
 		makeMatrixMassDiag(rows, finiteElement);
 
-	// As well as the oscillation time and time step (for numerical integration)
-	Real time = 2.0;
-	Real deltaT = 0.000001;
-	RealMatrix displacements =
-		calculateDisplacementsDinamic (time, deltaT,
-			matrixStiffness, matrixMassDiag);
+		RealMatrix displacements =
+			calculateDisplacementsDinamic(time, deltaT,
+				matrixStiffness, matrixMassDiag);
 
-	const UnsignedType rowsD = displacements.sizeRows();
-	writeDispSecondNode(rowsD, displacements);
+		const UnsignedType rowsD = displacements.sizeRows();
+		writeDispSecondNode(displacements);
+	}
+	catch (const std::exception& ex)
+	{
+		std::cout << "Error : " << ex.what() << "\n";
+		std::exit(EXIT_FAILURE);
+	}
 
 	UnsignedType steps = static_cast<UnsignedType> (time / deltaT);
 	writeStepsTime(steps, deltaT);

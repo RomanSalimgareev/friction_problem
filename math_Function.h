@@ -21,8 +21,7 @@ RealMatrix createMatrixCholesky(const RealMatrix& matrix);
 
 // Transpose matrix
 // noTranspose - the untransposed matrix
-template <typename T>
-Matrix<T> transpose(const Matrix<T>& noTranspose);
+RealMatrix transpose(const RealMatrix& noTranspose);
 
 // Solving a system of linear equations by the Gauss method with the 
 // choice of a leading element.

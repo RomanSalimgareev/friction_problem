@@ -333,6 +333,9 @@ RealMatrix calculateDisplacementsDinamic
 	RealVector initialDisplacements =
 		makeInitialDisps(matrixStiffness);
 
+	if (deltaT <= DBL_EPSILON)
+		ERROR_DIVIDE_ZERO();
+
 	UnsignedType stepsCount = static_cast<UnsignedType> (time / deltaT);
 	const UnsignedType rowsStiffness = matrixStiffness.sizeRows();
 	RealMatrix displacements(stepsCount, rowsStiffness);

@@ -9,11 +9,28 @@
 #include <iostream>
 
 #include "class_Matrix.h"
+#include "math_Function.h"
 
 using Real = double;
 using UnsignedType = UnsignedType;
 using Array3D = std::array<Real, 3>;
 using RealMatrix = Matrix<Real>;
+
+constexpr Real MIN_MODULUS_ELASTIC = 41.0e9;
+constexpr Real LIM_POISSONS_RATIO = 0.5;
+constexpr Real MIN_DENCITY = 1740.0;
+constexpr Real MAX_DENCITY = 19200.0;
+constexpr Real MIN_SIZE_FINITE_ELEMENT = 1.0e-3;
+
+enum Properties
+{
+	PROPERTIES_MODULUS_ELASTIC,
+	PROPERTIES_POISSONS_RATIO,
+	PROPERTIES_DENCITY,
+	PROPERTIES_LENGTH,
+	PROPERTIES_WIDTH,
+	PROPERTIES_HEIGTH,
+};
 
 // Finite element structure, default structure fields:
 // modulus of elasticity = 7e10;
