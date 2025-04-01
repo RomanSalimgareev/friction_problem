@@ -7,7 +7,10 @@ RealVector makeInitialStaticForce(const Real& initialForce,
 	// Indices of the action of static forces 
 	UnsignedType sizeIndices = INDICES_INITIAL.size();
 	if (sizeIndices == 0)
-		ERROR_SIZE_INDICES_INITIAL_ZERO();
+	{
+		std::string msg = "The size of the INDICES_INITIAL is 0. ";
+		ERROR(msg);
+	}
 
 	Real nodeLoad = initialForce / static_cast<Real> (sizeIndices);
 	for (auto index : INDICES_INITIAL)
@@ -16,8 +19,9 @@ RealVector makeInitialStaticForce(const Real& initialForce,
 			vectorInitial[index] = nodeLoad;
 		else
 		{
-			ASSERT(index < size, "The index goes beyond the array. ");
-			WARNING_INDEX_OUT_OF_RANGE();
+			std::string msg = messageOutOfRange();
+			ASSERT(index < sizeForce, msg);
+			WARNING(msg);
 			continue;
 		}
 	}
@@ -73,8 +77,9 @@ RealVector makeInitialSpeed(const UnsignedType& size)
 				vectorInitial[index] = speed;
 			else
 			{
-				ASSERT(index < size, "The index goes beyond the array. ");
-				WARNING_INDEX_OUT_OF_RANGE();
+				std::string msg = messageOutOfRange();
+				ASSERT(index < sizeForce, msg);
+				WARNING(msg);
 				continue;
 			}
 		}
@@ -98,8 +103,9 @@ RealVector makeInitialAccel(const UnsignedType& size)
 				vectorInitial[index] = acceleration;
 			else
 			{
-				ASSERT(index < size, "The index goes beyond the array. ");
-				WARNING_INDEX_OUT_OF_RANGE();
+				std::string msg = messageOutOfRange();
+				ASSERT(index < sizeForce, msg);
+				WARNING(msg);
 				continue;
 			}
 		}
@@ -119,8 +125,9 @@ void boundConditionStatic(RealMatrix& matrixStiffness)
 			index >= matrixStiffness.sizeColumns();
 		if (isOutOfRange)
 		{
-			ASSERT(isOutOfRange, "The index goes beyond the array. ");
-			WARNING_INDEX_OUT_OF_RANGE();
+			std::string msg = messageOutOfRange();
+			ASSERT(index < sizeForce, msg);
+			WARNING(msg);
 			continue;
 		}
 		else
@@ -137,11 +144,8 @@ RealVector calculateDispStatic
 	RealMatrix matrixCholesky = createMatrixCholesky(matrixStiffness);
 	if (force.size() < rows)
 	{
-		std::string msg = "The size of the force vector is smaller than \n"
-			"the rows of the stiffness matrix. ";
-		msg += std::string(__FILE__) + "\n";
-		log(LogLevel::ERROR, msg);
-		throw std::runtime_error(msg);
+		std::string msg = "Vector size < matrix rows. ";
+		ERROR(msg);
 	}
 
 	for (UnsignedType i = 0; i < rows; ++i)
@@ -153,7 +157,10 @@ RealVector calculateDispStatic
 		}
 
 		if (matrixCholesky[i][i] <= DBL_EPSILON)
-			ERROR_DIVIDE_ZERO();
+		{
+			std::string msg = messageDivideZero();
+			ERROR(msg);
+		}
 
 		interimSolution[i] = (force[i] - sum) / matrixCholesky[i][i];
 	}
@@ -172,7 +179,10 @@ RealVector calculateDispStatic
 		}
 
 		if (matrixCholesky[i][i] <= DBL_EPSILON)
-			ERROR_DIVIDE_ZERO();
+		{
+			std::string msg = messageDivideZero();
+			ERROR(msg);
+		}
 
 		displacements[i] = (interimSolution[i] - sum) / matrixCholesky[i][i];
 	}

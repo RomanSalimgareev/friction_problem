@@ -33,7 +33,10 @@ Real getAveragePointsSpeed(RealVector speed)
 {
 	UnsignedType sizeIndices = ACTIVE_INDICES.size();
 	if (sizeIndices == 0)
-		ERROR_SIZE_ACTIVE_INDICES_ZERO();
+	{
+		std::string msg = "The size of the ACTIVE_INDICES is 0. ";
+		ERROR(msg);
+	}
 
 	const UnsignedType sizeSpeed = speed.size();
 	Real sumSpeed = 0.0;
@@ -43,8 +46,9 @@ Real getAveragePointsSpeed(RealVector speed)
 			sumSpeed += speed[index];
 		else
 		{
-			ASSERT(index < sizeSpeed, "The index goes beyond the array. ");
-			WARNING_INDEX_OUT_OF_RANGE();
+			std::string msg = messageOutOfRange();
+			ASSERT(index < sizeSpeed, msg);
+			WARNING(msg);
 			continue;
 		}
 	}
@@ -77,8 +81,9 @@ Real getElasticForce(const RealVector& displacement,
 			sumVectorStiffness += matrixStiffness[index];
 		else
 		{
-			ASSERT(index < qualityValues, "The index goes beyond the array. ");
-			WARNING_INDEX_OUT_OF_RANGE();
+			std::string msg = messageOutOfRange();
+			ASSERT(index < sizeSpeed, msg);
+			WARNING(msg);
 			continue;
 		}
 	}
@@ -144,7 +149,10 @@ Real getNodeLoad(const Real& amplitudeForce)
 {
 	UnsignedType sizeIndices = ACTIVE_INDICES.size();
 	if (sizeIndices == 0)
-		ERROR_SIZE_ACTIVE_INDICES_ZERO();
+	{
+		std::string msg = "The size of the ACTIVE_INITIAL is 0. ";
+		ERROR(msg);
+	}
 
 	return amplitudeForce / static_cast<Real>(sizeIndices);
 }
@@ -234,8 +242,9 @@ Real getSumFrictionForce(const RealVector& force)
 			sumForce += force[index];
 		else
 		{
-			ASSERT(index < sizeForce, "The index goes beyond the array. ");
-			WARNING_INDEX_OUT_OF_RANGE();
+			std::string msg = messageOutOfRange();
+			ASSERT(index < sizeForce, msg);
+			WARNING(msg);
 			continue;
 		}
 	}
@@ -259,8 +268,9 @@ void setForceNormReaction(RealVector& force,
 			force[index] = -1.0 * normalReaction;
 		else
 		{
-			ASSERT(index < sizeForce, "The index goes beyond the array. ");
-			WARNING_INDEX_OUT_OF_RANGE();
+			std::string msg = messageOutOfRange();
+			ASSERT(index < sizeForce, msg);
+			WARNING(msg);
 			continue;
 		}
 	}
@@ -289,8 +299,9 @@ void setForceDry(const Real& elasticForce,
 		}
 		else
 		{
-			ASSERT(index < sizeForce, "The index goes beyond the array. ");
-			WARNING_INDEX_OUT_OF_RANGE();
+			std::string msg = messageOutOfRange();
+			ASSERT(index < sizeForce, msg);
+			WARNING(msg);
 			continue;
 		}
 	}
@@ -322,8 +333,9 @@ void setForceDriveDry(const Real& signForce,
 		}
 		else
 		{
-			ASSERT(index < sizeForce, "The index goes beyond the array. ");
-			WARNING_INDEX_OUT_OF_RANGE();
+			std::string msg = messageOutOfRange();
+			ASSERT(index < sizeForce, msg);
+			WARNING(msg);
 			continue;
 		}
 	}
@@ -339,8 +351,9 @@ void setForceViscous(const Real& nodeLoad, const Real& frequency,
 			force[index] = nodeLoad * cos(frequency * sumSteps);
 		else
 		{
-			ASSERT(index < sizeForce, "The index goes beyond the array. ");
-			WARNING_INDEX_OUT_OF_RANGE();
+			std::string msg = messageOutOfRange();
+			ASSERT(index < sizeForce, msg);
+			WARNING(msg);
 			continue;
 		}
 	}

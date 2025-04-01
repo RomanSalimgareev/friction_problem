@@ -28,44 +28,38 @@ void log(LogLevel level, const std::string& message)
 		}
 		ctime_s(buffer, sizeof(buffer), &now);
 		logFile << "[" << buffer << "] : " << levelStr << "" <<
-			message << "\n";
+			message << "\n\n";
 	}
 }
 
-void errorDivideZero(const char* file)
+void error(std::string msg, const char* file, const long& line)
 {
-	std::string msg = "Dividing by 0. ";
-	msg += std::string(file) + "\n";
+	msg += "Location error: ";
+	msg += std::string(file) + "\t";
+
+	msg += "Line error: ";
+	msg += std::to_string(line) + "\n\n";
+
 	log(LogLevel::ERROR, msg);
 	throw std::runtime_error(msg);
 }
 
-void errorSizeIndicesInitialZero(const char* file)
+void warning(std::string msg, const char* file, const long& line)
 {
-	std::string msg = "The size of the INDICES_INITIAL is 0. ";
-	msg += std::string(file) + "\n";
-	log(LogLevel::ERROR, msg);
-	throw std::runtime_error(msg);
-}
+	msg += "Location error: ";
+	msg += std::string(file) + "\t";
 
-void errorSizeActiveIndicesZero(const char* file)
-{
-	std::string msg = "The size of the ACTIVE_INDICES is 0. ";
-	msg += std::string(file) + "\n";
-	log(LogLevel::ERROR, msg);
-	throw std::runtime_error(msg);
-}
-
-void warningIndexOutOfRange(const char* file)
-{
-	std::string msg = "The index goes beyond the array. ";
-	msg += std::string(__FILE__) + "\n";
+	msg += "Line error: ";
+	msg += std::to_string(line) + "\n\n";
 	log(LogLevel::WARNING, msg);
 }
 
-void warningFuncNotCalculate(const char* file)
+std::string messageOutOfRange()
 {
-	std::string msg = "The function did not calculate the value. ";
-	msg += std::string(__FILE__) + "\n";
-	log(LogLevel::WARNING, msg);
+	return "Out of range. ";
+}
+
+std::string messageDivideZero()
+{
+	return "Dividing by zero. ";
 }

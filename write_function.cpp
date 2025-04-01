@@ -1,12 +1,17 @@
 #include "write_function.h"
 
+std::string messageNotRecorded()
+{
+	return "The displacements are not recorded. ";
+}
+
 void checkFileOpen(std::ofstream& fout, bool& isWrite)
 {
 	if (fout.is_open() == false)
 	{
-		std::string msg = "The file was not opened. Location of the warning: ";
-		msg += std::string(__FILE__) + "\n";
-		log(LogLevel::WARNING, msg);
+		std::string msg = "The file was not opened. ";
+		WARNING(msg);
+
 		isWrite = false;
 	}
 	std::cout << "File is not open. \n";
@@ -29,6 +34,9 @@ bool writeDispAllNodes(const Matrix<Real>& displacements)
 		}
 		else
 		{
+			std::string msg = messageNotRecorded();
+			WARNING(msg);
+
 			isWrite = false;
 			break;
 		}
@@ -51,6 +59,9 @@ bool writeDispFirstNode(const Matrix<Real>& displacements)
 			fout << displacements[i][0] << "\n";
 		else
 		{
+			std::string msg = messageNotRecorded();
+			WARNING(msg);
+
 			isWrite = false;
 			break;
 		}
@@ -74,6 +85,9 @@ bool writeDispSecondNode(const Matrix<Real>& displacements)
 			fout << displacements[i][1] << "\n";
 		else
 		{
+			std::string msg = messageNotRecorded();
+			WARNING(msg);
+
 			isWrite = false;
 			break;
 		}
@@ -97,6 +111,9 @@ bool writeDispFifthNode(const Matrix<Real>& displacements)
 			fout << displacements[i][4] << "\n";
 		else
 		{
+			std::string msg = messageNotRecorded();
+			WARNING(msg);
+
 			isWrite = false;
 			break;
 		}
@@ -120,6 +137,9 @@ bool writeDispSixthNode(const Matrix<Real>& displacements)
 			fout << displacements[i][6] << "\n";
 		else
 		{
+			std::string msg = messageNotRecorded();
+			WARNING(msg);
+
 			isWrite = false;
 			break;
 		}

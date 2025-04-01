@@ -2,6 +2,16 @@
 
 #include "operator_overloading.h"
 
+std::string messageSizeFirstLess()
+{
+	return "Vector size first < vector size second. ";
+}
+
+std::string messageSizeMatricestNotEqual()
+{
+	return "The sizes of the matrices are not equal. ";
+}
+
 template <typename T>
 std::ostream& operator << (const Matrix<T>& matrix,
 	std::ostream& out)
@@ -65,11 +75,8 @@ RealVector& operator+= (RealVector& vectorFirst,
 	const UnsignedType sizeSecond = vectorSecond.size();
 	if (vectorFirst.size() < sizeSecond)
 	{
-		std::string msg = "Going outside the array, the size of the second "
-			"vector is larger than the first.";
-		msg += std::string(__FILE__) + "\n";
-		log(LogLevel::ERROR, msg);
-		throw std::out_of_range(msg);
+		std::string msg = messageSizeFirstLess();
+		ERROR(msg);
 	}
 
 	for (UnsignedType i = 0; i < sizeSecond; ++i)
@@ -86,11 +93,8 @@ RealVector operator+ (const RealVector& vectorFirst,
 	const UnsignedType sizeSecond = vectorSecond.size();
 	if (vectorFirst.size() < sizeSecond)
 	{
-		std::string msg = "Going outside the array, the size of the second "
-			"vector is larger than the first.";
-		msg += std::string(__FILE__) + "\n";
-		log(LogLevel::ERROR, msg);
-		throw std::out_of_range(msg);
+		std::string msg = messageSizeFirstLess();
+		ERROR(msg);
 	}
 
 	for (UnsignedType i = 0; i < sizeSecond; ++i)
@@ -107,11 +111,8 @@ RealVector operator- (const RealVector& vectorFirst,
 	const UnsignedType sizeSecond = vectorSecond.size();
 	if (vectorFirst.size() < sizeSecond)
 	{
-		std::string msg = "Going outside the array, the size of the second "
-			"vector is larger than the first.";
-		msg += std::string(__FILE__) + "\n";
-		log(LogLevel::ERROR, msg);
-		throw std::out_of_range(msg);
+		std::string msg = messageSizeFirstLess();
+		ERROR(msg);
 	}
 
 	for (UnsignedType i = 0; i < sizeSecond; ++i)
@@ -162,11 +163,8 @@ Real operator* (const RealVector& vectorFirst,
 	const UnsignedType sizeSecond = vectorSecond.size();
 	if (vectorFirst.size() != sizeSecond)
 	{
-		std::string msg = "Going outside the array, the size of the second "
-			"vector is not equal to the size of the first one.";
-		msg += std::string(__FILE__) + "\n";
-		log(LogLevel::ERROR, msg);
-		throw std::out_of_range(msg);
+		std::string msg = "The size of the vectors are not equal. ";
+		ERROR(msg);
 	}
 	for (UnsignedType i = 0; i < sizeSecond; ++i)
 	{
@@ -221,11 +219,8 @@ RealMatrix operator+ (const RealMatrix& matrixFirst,
 	if (matrixSecond.sizeRows() != rows and
 		matrixSecond.sizeColumns() != columns)
 	{
-		std::string msg = "Going outside the array, "
-			"the sizes of the matrices are not equal.";
-		msg += std::string(__FILE__) + "\n";
-		log(LogLevel::ERROR, msg);
-		throw std::out_of_range(msg);
+		std::string msg = messageSizeMatricestNotEqual();
+		ERROR(msg);
 	}
 
 	for (UnsignedType i = 0; i < rows; ++i)
@@ -249,11 +244,8 @@ RealMatrix operator- (const RealMatrix& matrixFirst,
 	if (matrixSecond.sizeRows() != rows and
 		matrixSecond.sizeColumns() != columns)
 	{
-		std::string msg = "Going outside the array, "
-			"the sizes of the matrices are not equal.";
-		msg += std::string(__FILE__) + "\n";
-		log(LogLevel::ERROR, msg);
-		throw std::out_of_range(msg);
+		std::string msg = messageSizeMatricestNotEqual();
+		ERROR(msg);
 	}
 
 	for (UnsignedType i = 0; i < rows; ++i)

@@ -1,5 +1,10 @@
 #include "matrix_MFE.h"
 
+std::string messageFuncNotCalculate()
+{
+	return messageFuncNotCalculate();
+}
+
 void checkIncorrectValue(Properties propertyFiniteElement, Real& value)
 {
 	switch (propertyFiniteElement)
@@ -135,8 +140,9 @@ Real shapeFunction(const Array3D& locPoint, const Array3D& quadPoint)
 	}
 	else
 	{
-		ASSERT(isCorrectData, "The function did not calculate the value. ");
-		WARNING_FUNC_NOT_CALCULATE();
+		std::string msg = messageFuncNotCalculate();
+		ASSERT(isCorrectData, msg);
+		WARNING(msg);
 	}
 
 	return result;
@@ -158,8 +164,9 @@ Real dShapeFuncKsi(const Array3D& locPoint,
 	}
 	else
 	{
-		ASSERT(isCorrectData, "The function did not calculate the value. ");
-		WARNING_FUNC_NOT_CALCULATE();
+		std::string msg = messageFuncNotCalculate();
+		ASSERT(isCorrectData, msg);
+		WARNING(msg);
 	}
 
 	return dKsi;
@@ -180,8 +187,9 @@ Real dShapeFuncEtta(const Array3D& locPoint,
 	}
 	else
 	{
-		ASSERT(isCorrectData, "The function did not calculate the value. ");
-		WARNING_FUNC_NOT_CALCULATE();
+		std::string msg = messageFuncNotCalculate();
+		ASSERT(isCorrectData, msg);
+		WARNING(msg);
 	}
 
 	return dEtta;
@@ -202,8 +210,9 @@ Real dShapeFuncPsi(const Array3D& locPoint,
 	}
 	else
 	{
-		ASSERT(isCorrectData, "The function did not calculate the value. ");
-		WARNING_FUNC_NOT_CALCULATE();
+		std::string msg = messageFuncNotCalculate();
+		ASSERT(isCorrectData, msg);
+		WARNING(msg);
 	}
 
 	return dPsi;
@@ -230,10 +239,7 @@ RealMatrix makeMatrixElConst(const UnsignedType& rows,
 		std::string msg = "The Poisson's ratio is greater than or "
 			"equal to 0.5. ";
 		ASSERT(poissonRatio < LIM_POISSONS_RATIO, msg);
-
-		msg += std::string(__FILE__) + "\n";
-		log(LogLevel::ERROR, msg);
-		throw std::range_error(msg);
+		ERROR(msg);
 	}
 
 	for (UnsignedType i = 0; i < rows; ++i)
@@ -288,11 +294,8 @@ RealMatrix makeMatrixBtD(const RealMatrix& bTranspose,
 	const UnsignedType elasticRows = elasticConstMatrix.sizeRows();
 	if (btColumns != elasticRows)
 	{
-		std::string msg = "The number of columns of the first matrix does \n"
-			"not match the number of rows of the second matrix. ";
-		msg += std::string(__FILE__) + "\n";
-		log(LogLevel::ERROR, msg);
-		throw std::runtime_error(msg);
+		std::string msg = "Matrix size mismatch : cols(A) != rows(B). ";
+		ERROR(msg);
 	}
 
 	RealMatrix result(btColumns, elasticRows);
@@ -322,7 +325,10 @@ RealMatrix makeMatrixMassDiag(const UnsignedType& size,
 	Real mass = dencity * length * width * heigth;
 
 	if (nNodes == 0)
-		ERROR_DIVIDE_ZERO();
+	{
+		std::string msg = messageDivideZero();
+		ERROR(msg);
+	}
 
 	for (UnsignedType i = 0; i < size; ++i)
 	{
@@ -351,10 +357,8 @@ RealMatrix makeMatrixMassJoint(const UnsignedType& size,
 	RealMatrix matrixMass(size, size);
 	if (size < locCoordColumns)
 	{
-		std::string msg = "Out of range. ";
-		msg += std::string(__FILE__) + "\n";
-		log(LogLevel::ERROR, msg);
-		throw std::runtime_error(msg);
+		std::string msg = messageOutOfRange();
+		ERROR(msg);
 	}
 
 	for (UnsignedType i = 0; i < locCoordColumns; ++i)
@@ -498,10 +502,8 @@ RealMatrix makeMatrixStiffness(const FiniteElement& finiteElement)
 		if (matrixBtD.sizeRows() < sizeStiffness and
 			matrixDifferentiation.sizeColumns() < sizeStiffness)
 		{
-			std::string msg = "Out of range. ";
-			msg += std::string(__FILE__) + "\n";
-			log(LogLevel::ERROR, msg);
-			throw std::runtime_error(msg);
+			std::string msg = messageOutOfRange();
+			ERROR(msg);
 		}
 
 		for (UnsignedType i = 0; i < sizeStiffness; ++i)
@@ -512,20 +514,14 @@ RealMatrix makeMatrixStiffness(const FiniteElement& finiteElement)
 				if (matrixBtD.sizeColumns() < rowsElastic and
 					matrixDifferentiation.sizeRows() < rowsElastic)
 				{
-					std::string msg = "Out of range. ";
-					msg += std::string(__FILE__) + "\n";
-					log(LogLevel::ERROR, msg);
-					throw std::runtime_error(msg);
+					std::string msg = messageOutOfRange();
+					ERROR(msg);
 				}
 
 				if (matrixBtD.sizeColumns() != matrixDifferentiation.sizeRows())
 				{
-					std::string msg = "The number of columns of the first \n"
-						" matrix does not match the number of rows "
-						"of the second matrix. ";
-					msg += std::string(__FILE__) + "\n";
-					log(LogLevel::ERROR, msg);
-					throw std::runtime_error(msg);
+					std::string msg = "Matrix size mismatch : cols(A) != rows(B). ";
+					ERROR(msg);
 				}
 
 				for (UnsignedType k = 0; k < rowsElastic; ++k)

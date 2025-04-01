@@ -6,12 +6,9 @@ RealMatrix createMatrixCholesky(const RealMatrix& matrixStiffness)
 	UnsignedType rowsStiffness = matrixStiffness.sizeRows();
 	if (rowsStiffness != matrixStiffness.sizeColumns())
 	{
-		std::string msg = "The stiffness matrix is not square. ";
+		std::string msg = "The matrix is not square. ";
 		ASSERT(rowsStiffness == matrixStiffness.sizeColumns(), msg);
-
-		msg += std::string(__FILE__) + "\n";
-		log(LogLevel::ERROR, msg);
-		throw std::runtime_error(msg);
+		ERROR(msg);
 	}
 
 	RealMatrix matrixCholesky(rowsStiffness, rowsStiffness);
@@ -30,7 +27,10 @@ RealMatrix createMatrixCholesky(const RealMatrix& matrixStiffness)
 					sum += (matrixCholesky[i][k] * matrixCholesky[j][k]);
 
 				if (matrixCholesky[j][j] <= DBL_EPSILON)
-					ERROR_DIVIDE_ZERO();
+				{
+					std::string msg = messageDivideZero();
+					ERROR(msg);
+				}
 
 				matrixCholesky[i][j] = 
 					(matrixStiffness[i][j] - sum) / matrixCholesky[j][j];
@@ -68,15 +68,11 @@ RealVector solveGauss(const RealMatrix& matrixCoefficients,
 	RealMatrix A = matrixCoefficients;
 	RealVector B = columnFreeMembers;
 	RealVector result(rows, 0.0);
-	if (rows != columnFreeMembers.size())
+	if (columnFreeMembers.size() != rows)
 	{
-		std::string msg = "The size of the column of free terms does \n"
-			"not match the number of rows in the coefficient matrix. ";
+		std::string msg = "Vector size < matrix rows. ";
 		ASSERT(rows == columnFreeMembers.size(), msg);
-
-		msg += std::string(__FILE__) + "\n";
-		log(LogLevel::ERROR, msg);
-		throw std::runtime_error(msg);
+		ERROR(msg);
 	}
 
 	for (UnsignedType i = 0; i < columns; ++i)
@@ -97,7 +93,10 @@ RealVector solveGauss(const RealMatrix& matrixCoefficients,
 		{
 			Real firstCoefficient = A[k][i];
 			if (firstCoefficient <= DBL_EPSILON)
-				ERROR_DIVIDE_ZERO();
+			{
+				std::string msg = messageDivideZero();
+				ERROR(msg);
+			}
 
 			if (k == i)
 				B[k] = B[k] / firstCoefficient;

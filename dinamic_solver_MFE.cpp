@@ -334,7 +334,10 @@ RealMatrix calculateDisplacementsDinamic
 		makeInitialDisps(matrixStiffness);
 
 	if (deltaT <= DBL_EPSILON)
-		ERROR_DIVIDE_ZERO();
+	{
+		std::string msg = messageDivideZero();
+		ERROR(msg);
+	}
 
 	UnsignedType stepsCount = static_cast<UnsignedType> (time / deltaT);
 	const UnsignedType rowsStiffness = matrixStiffness.sizeRows();
