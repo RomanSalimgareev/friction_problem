@@ -53,6 +53,12 @@ void Matrix<T>::eraseRowMatrix(const UnsignedType& i)
 	m_matrix.erase(m_matrix.begin() + i);
 }
 
+template <typename T>
+bool Matrix<T>::empty() const
+{
+	return m_matrix.empty();
+}
+
 template class Matrix<int>;
 template class Matrix<float>;
 template class Matrix<double>;

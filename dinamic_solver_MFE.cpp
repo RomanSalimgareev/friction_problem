@@ -11,6 +11,21 @@ void boundConditionsDinamic(RealMatrix& matrixStiffness,
 	{ 1, 2, 5, 6, 8, 9, 10 ,11, 13, 18, 21, 22 };
 	UnsignedType displacementRows = displacement.sizeRows();
 	UnsignedType rowsStiffness = matrixStiffness.sizeRows();
+	if (rowsStiffness != matrixStiffness.sizeColumns())
+	{
+		std::string msg = "The stiffness matrix is not square. ";
+		ERROR(msg);
+	}
+
+	bool isSizeEqual = rowsStiffness != matrixMass.sizeRows() and
+		matrixStiffness.sizeColumns() != matrixMass.sizeColumns();
+
+	if (isSizeEqual == false)
+	{
+		std::string msg = "The sizes of the matrices are not equal. ";
+		ERROR(msg);
+	}
+
 	UnsignedType j = 0;
 
 	// The corresponding columns and rows are deleted
@@ -22,9 +37,19 @@ void boundConditionsDinamic(RealMatrix& matrixStiffness,
 		{
 			matrixStiffness.eraseRowMatrix(j);
 			matrixMass.eraseRowMatrix(j);
-			speed.erase(speed.begin() + j);
-			acceleration.erase(acceleration.begin() + j);
-			force.erase(force.begin() + j);
+
+			if (j < speed.size() and j < acceleration.size() and
+				j < force.size())
+			{
+				speed.erase(speed.begin() + j);
+				acceleration.erase(acceleration.begin() + j);
+				force.erase(force.begin() + j);
+			}
+			else
+			{
+				std::string msg = "Invalid argument. ";
+				ERROR(msg);
+			}
 		}
 		else
 			++j;
@@ -35,7 +60,7 @@ void boundConditionsDinamic(RealMatrix& matrixStiffness,
 	{
 		j = 0;
 		UnsignedType k = 0;
-		while (j != rowsStiffness)
+		while (j < rowsStiffness)
 		{
 			auto iter = std::find(indexsConditions.begin(),
 				indexsConditions.end(), k);
@@ -44,8 +69,13 @@ void boundConditionsDinamic(RealMatrix& matrixStiffness,
 				matrixStiffness[i].erase(matrixStiffness[i].begin() + j);
 				matrixMass[i].erase(matrixMass[i].begin() + j);
 
-				if (i < displacementRows)
+				if (i < displacementRows and j < displacement[i].size())
 					displacement[i].erase(displacement[i].begin() + j);
+				else
+				{
+					std::string msg = "Invalid argument. ";
+					ERROR(msg);
+				}
 			}
 			else
 				j++;
@@ -240,6 +270,12 @@ void forcedDryFriction(const UnsignedType& stepsCount, const Real& deltaT,
 			RealVector differenceDisps =
 				displacements[i + 1] - displacements[i];
 
+			if (ALPHA == 0 or deltaT == 0)
+			{
+				std::string msg = messageDivideZero();
+				ERROR(msg);
+			}
+
 			accelerationNew = (1.0 / alphaDt2 * differenceDisps) -
 				(1.0 / alphaDt * speedOld) +
 				((1.0 - 1.0 / (2.0 * ALPHA)) * accelerationOld);
@@ -311,6 +347,12 @@ void viscousFrictionForce(const UnsignedType& stepsCount, const Real& deltaT,
 		RealVector differenceDisps =
 			displacements[i + 1] - displacements[i];
 
+		if (ALPHA == 0 or deltaT == 0)
+		{
+			std::string msg = messageDivideZero();
+			ERROR(msg);
+		}
+
 		accelerationNew = (1.0 / alphaDt2 * differenceDisps) -
 			(1.0 / alphaDt) * speedOld +
 			(1.0 - 0.5 / ALPHA) * accelerationOld;
@@ -342,7 +384,11 @@ RealMatrix calculateDisplacementsDinamic
 	UnsignedType stepsCount = static_cast<UnsignedType> (time / deltaT);
 	const UnsignedType rowsStiffness = matrixStiffness.sizeRows();
 	RealMatrix displacements(stepsCount, rowsStiffness);
-	displacements[0] = initialDisplacements;
+	
+	if (displacements.sizeRows() != 0)
+		displacements[0] = initialDisplacements;
+	else
+		return RealMatrix(0, 0);
 
 	UnsignedType choice = getFrictionMode();
 	

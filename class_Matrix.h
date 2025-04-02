@@ -33,6 +33,8 @@ public:
 
 	void eraseRowMatrix(const UnsignedType& index);
 
+	bool empty() const;
+
 private:
 
 	std::vector<std::vector<T>> m_matrix;
