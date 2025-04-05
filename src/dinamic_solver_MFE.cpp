@@ -2,14 +2,12 @@
 
 // Applying symmetry conditions to symmetry nodes for a dynamic problem
 void boundConditionsDinamic(RealMatrix& matrixStiffness,
-	RealMatrix& matrixMass, RealMatrix& displacement,
+	RealMatrix& matrixMass, RealMatrix& displacements,
 	RealVector& speed, RealVector& acceleration,
 	RealVector& force)
 {
 	// Indices of degrees of freedom that are subject to symmetry conditions
-	std::vector<UnsignedType> indexsConditions =
-	{ 1, 2, 5, 6, 8, 9, 10 ,11, 13, 18, 21, 22 };
-	UnsignedType displacementRows = displacement.sizeRows();
+	UnsignedType displacementRows = displacements.sizeRows();
 	UnsignedType rowsStiffness = matrixStiffness.sizeRows();
 	if (rowsStiffness != matrixStiffness.sizeColumns())
 	{
@@ -26,61 +24,36 @@ void boundConditionsDinamic(RealMatrix& matrixStiffness,
 		ERROR(msg);
 	}
 
-	UnsignedType j = 0;
-
 	// The corresponding columns and rows are deleted
-	for (UnsignedType i = 0; i < rowsStiffness; ++i)
+	UnsignedType sizeIndicesSymmetry = INDICES_SYMMETRY_CONDITION.size();
+	for (UnsignedType index = sizeIndicesSymmetry - 1; index > 0; --index)
 	{
-		auto iter = std::find(indexsConditions.begin(),
-			indexsConditions.end(), i);
-		if (iter != indexsConditions.end())
-		{
-			matrixStiffness.eraseRowMatrix(j);
-			matrixMass.eraseRowMatrix(j);
+		UnsignedType rowNum = INDICES_SYMMETRY_CONDITION[index];
 
-			if (j < speed.size() and j < acceleration.size() and
-				j < force.size())
-			{
-				speed.erase(speed.begin() + j);
-				acceleration.erase(acceleration.begin() + j);
-				force.erase(force.begin() + j);
-			}
-			else
-			{
-				std::string msg = "Invalid argument. ";
-				ERROR(msg);
-			}
+		matrixStiffness.eraseRow(rowNum);
+		matrixMass.eraseRow(rowNum);
+
+		if (rowNum < speed.size() and rowNum < acceleration.size() and
+			rowNum < force.size())
+		{
+			speed.erase(speed.begin() + rowNum);
+			acceleration.erase(acceleration.begin() + rowNum);
+			force.erase(force.begin() + rowNum);
 		}
 		else
-			++j;
+		{
+			std::string msg = "Invalid argument. ";
+			ERROR(msg);
+		}
 	}
 
-	rowsStiffness = matrixStiffness.sizeRows();
-	for (UnsignedType i = 0; i < rowsStiffness; ++i)
+	for (UnsignedType index = sizeIndicesSymmetry - 1; index > 0; --index)
 	{
-		j = 0;
-		UnsignedType k = 0;
-		while (j < rowsStiffness)
-		{
-			auto iter = std::find(indexsConditions.begin(),
-				indexsConditions.end(), k);
-			if (iter != indexsConditions.end())
-			{
-				matrixStiffness[i].erase(matrixStiffness[i].begin() + j);
-				matrixMass[i].erase(matrixMass[i].begin() + j);
+		UnsignedType columnNum = INDICES_SYMMETRY_CONDITION[index];
+		matrixStiffness.eraseColumn(columnNum);
+		matrixMass.eraseColumn(columnNum);
 
-				if (i < displacementRows and j < displacement[i].size())
-					displacement[i].erase(displacement[i].begin() + j);
-				else
-				{
-					std::string msg = "Invalid argument. ";
-					ERROR(msg);
-				}
-			}
-			else
-				j++;
-			k++;
-		}
+		displacements.eraseColumn(columnNum);
 	}
 }
 
@@ -114,10 +87,10 @@ void dryFrictionFree(const UnsignedType& stepsCount, const Real& deltaT,
 	Real alphaDt2 = ALPHA * pow(deltaT, 2);
 	Real alphaDt = ALPHA * deltaT;
 	Real sumSteps = 0.0;
-	for (UnsignedType i = 0; i < stepsCount - 1; ++i)
+	for (UnsignedType step = 0; step < stepsCount - 1; ++step)
 	{
 		Real elasticForce =
-			getElasticForce(displacements[i], matrixStiffness);
+			getElasticForce(displacements[step], matrixStiffness);
 
 		Real averagePointsSpeed = getAveragePointsSpeed(speedOld);
 
@@ -134,30 +107,32 @@ void dryFrictionFree(const UnsignedType& stepsCount, const Real& deltaT,
 		if (isFrictionGreater and isLowSpeed)
 		{
 			// The knot is sticking
-			displacements[i + 1] = displacements[i];
+			displacements[step + 1] = displacements[step];
 		}
 		else
 		{
 			// Calculation of displacements using formulas from the textbook,
 			// as well as using the Gauss method with a leading element
-			RealVector b = alphaDt2 * force +
-				matrixMass * (displacements[i] +
-					deltaT * (speedOld -
-						(ALPHA - 0.5) * deltaT * accelerationOld));
+			RealVector columnFreeMembers = alphaDt2 * force;
+			columnFreeMembers += matrixMass * (displacements[step] +
+				deltaT * (speedOld - (ALPHA - 0.5) * deltaT * accelerationOld));
 
-			RealMatrix a = matrixMass + alphaDt2 * matrixStiffness;
-			displacements[i + 1] = solveGauss(a, b);
+			RealMatrix matrixCoefficients = 
+				matrixMass + alphaDt2 * matrixStiffness;
+
+			displacements[step + 1] = 
+				solveGauss(matrixCoefficients, columnFreeMembers);
 
 			RealVector differenceDisps =
-				displacements[i + 1] - displacements[i];
+				displacements[step + 1] - displacements[step];
 
-			accelerationNew = 1.0 / alphaDt2 * differenceDisps
-				- (1.0 / alphaDt * speedOld)
-				+ (1.0 - 0.5 / ALPHA) * accelerationOld;
+			accelerationNew = 1.0 / alphaDt2 * differenceDisps;
+			accelerationNew -= 1.0 / alphaDt * speedOld;
+			accelerationNew += (1.0 - 0.5 / ALPHA) * accelerationOld;
 
-			speedNew = (DELTA / alphaDt) * differenceDisps +
-				(1.0 - DELTA / ALPHA) * speedOld +
-				(1.0 - 0.5 * DELTA / ALPHA) * deltaT * accelerationOld;
+			speedNew = (DELTA / alphaDt) * differenceDisps;
+			speedNew += (1.0 - DELTA / ALPHA) * speedOld;
+			speedNew += (1.0 - 0.5 * DELTA / ALPHA) * deltaT * accelerationOld;
 
 			speedOld = speedNew;
 			accelerationOld = accelerationNew;
@@ -206,11 +181,11 @@ void forcedDryFriction(const UnsignedType& stepsCount, const Real& deltaT,
 	Real alphaDt = ALPHA * deltaT;
 	Real sumSteps = 0.0;
 	Real signForce = 0;
-	for (UnsignedType i = 0; i < stepsCount - 1; ++i)
+	for (UnsignedType step = 0; step < stepsCount - 1; ++step)
 	{
 		Real driveForceNode = nodeLoad * cos(frequency * sumSteps);
 		Real elasticForce =
-			getElasticForce(displacements[i], matrixStiffness);
+			getElasticForce(displacements[step], matrixStiffness);
 
 		Real averagePointsSpeed = getAveragePointsSpeed(speedOld);
 
@@ -253,22 +228,27 @@ void forcedDryFriction(const UnsignedType& stepsCount, const Real& deltaT,
 				driveElasticCondition))
 		{
 			// The knot is sticking
-			displacements[i + 1] = displacements[i];
+			displacements[step + 1] = displacements[step];
 		}
 		else
 		{
 			// Calculation of displacements using formulas from the textbook,
-			// as well as using the Gauss method with a leading element
-			RealVector freeMembers = alphaDt2 * force +
-				matrixMass * (displacements[i] + deltaT * (speedOld -
-					(ALPHA - 0.5) * deltaT * accelerationOld));
+			// as well as using the Gauss method with a leading element 
 
-			RealMatrix matrixCoeffs = matrixMass +
-				alphaDt2 * matrixStiffness;
-			displacements[i + 1] = solveGauss(matrixCoeffs, freeMembers);
+			RealVector accelTerm = (ALPHA - 0.5) * deltaT * accelerationOld;
+
+			RealVector innerSum = displacements[step] +
+				deltaT * (speedOld - accelTerm);
+
+			RealVector freeMembers = alphaDt2 * force + matrixMass * innerSum;
+
+
+			RealMatrix matrixCoeffs = matrixMass + alphaDt2 * matrixStiffness;
+
+			displacements[step + 1] = solveGauss(matrixCoeffs, freeMembers);
 
 			RealVector differenceDisps =
-				displacements[i + 1] - displacements[i];
+				displacements[step + 1] - displacements[step];
 
 			if (ALPHA == 0 or deltaT == 0)
 			{
@@ -276,13 +256,13 @@ void forcedDryFriction(const UnsignedType& stepsCount, const Real& deltaT,
 				ERROR(msg);
 			}
 
-			accelerationNew = (1.0 / alphaDt2 * differenceDisps) -
-				(1.0 / alphaDt * speedOld) +
-				((1.0 - 1.0 / (2.0 * ALPHA)) * accelerationOld);
+			accelerationNew = 1.0 / alphaDt2 * differenceDisps;
+			accelerationNew -= 1.0 / alphaDt * speedOld;
+			accelerationNew += ((1.0 - 1.0 / (2.0 * ALPHA)) * accelerationOld);
 
-			speedNew = (DELTA / alphaDt * differenceDisps) +
-				((1.0 - DELTA / ALPHA) * speedOld) +
-				((1.0 - DELTA / (2.0 * ALPHA)) * deltaT * accelerationOld);
+			speedNew = DELTA / alphaDt * differenceDisps;
+			speedNew += (1.0 - DELTA / ALPHA) * speedOld;
+			speedNew += (1.0 - DELTA / (2.0 * ALPHA)) * deltaT * accelerationOld;
 
 			speedOld = speedNew;
 			accelerationOld = accelerationNew;
@@ -326,26 +306,35 @@ void viscousFrictionForce(const UnsignedType& stepsCount, const Real& deltaT,
 
 	// Calculation of displacements using formulas from the textbook,
 	// as well as using the Gauss method with a leading element
-	for (UnsignedType i = 0; i < stepsCount - 1; ++i)
+	for (UnsignedType step = 0; step < stepsCount - 1; ++step)
 	{
 		setForceViscous(nodeLoad, frequency, sumSteps, force);
 
-		RealVector freeMembers = alphaDt2 * force +
-			matrixMass * (displacements[i] +
-				deltaT * (DELTA * coeffViscousfriction * displacements[i] +
-					speedOld * (1.0 +
-						(DELTA - ALPHA) * deltaT * coeffViscousfriction) -
-					deltaT * accelerationOld * ((ALPHA - 0.5) -
-						deltaT * (ALPHA - DELTA * 0.5) * coeffViscousfriction)));
+		RealVector dampingTerm = 
+			DELTA * coeffViscousfriction * displacements[step];
 
-		RealMatrix matrixCoeffs = matrixMass +
-			deltaT * (alphaDt * matrixStiffness
-				+ DELTA * coeffViscousfriction * matrixMass);
+		RealVector speedTerm = 
+			speedOld * (1.0 + (DELTA - ALPHA) * deltaT * coeffViscousfriction);
 
-		displacements[i + 1] = solveGauss(matrixCoeffs, freeMembers);
+		RealVector accelTerm = accelerationOld * ((ALPHA - 0.5) - 
+			deltaT * (ALPHA - DELTA * 0.5) * coeffViscousfriction);
+
+		RealVector innerSumFreeMembers = displacements[step] +
+			deltaT * (dampingTerm + speedTerm - deltaT * accelTerm);
+
+		RealVector freeMembers = alphaDt2 * force + 
+			matrixMass * innerSumFreeMembers;
+	
+
+		RealMatrix innerSumMatrixCoeffs = alphaDt * matrixStiffness +
+			DELTA * coeffViscousfriction * matrixMass;
+
+		RealMatrix matrixCoeffs = matrixMass + deltaT * innerSumMatrixCoeffs;
+
+		displacements[step + 1] = solveGauss(matrixCoeffs, freeMembers);
 
 		RealVector differenceDisps =
-			displacements[i + 1] - displacements[i];
+			displacements[step + 1] - displacements[step];
 
 		if (ALPHA == 0 or deltaT == 0)
 		{
@@ -353,13 +342,13 @@ void viscousFrictionForce(const UnsignedType& stepsCount, const Real& deltaT,
 			ERROR(msg);
 		}
 
-		accelerationNew = (1.0 / alphaDt2 * differenceDisps) -
-			(1.0 / alphaDt) * speedOld +
-			(1.0 - 0.5 / ALPHA) * accelerationOld;
+		accelerationNew = 1.0 / alphaDt2 * differenceDisps;
+		accelerationNew -= (1.0 / alphaDt) * speedOld;
+		accelerationNew += (1.0 - 0.5 / ALPHA) * accelerationOld;
 
-		speedNew = (DELTA / alphaDt) * differenceDisps +
-			(1.0 - DELTA / ALPHA) * speedOld +
-			(1.0 - 0.5 * DELTA / ALPHA) * deltaT * accelerationOld;
+		speedNew = (DELTA / alphaDt) * differenceDisps;
+		speedNew += (1.0 - DELTA / ALPHA) * speedOld;
+		speedNew += (1.0 - 0.5 * DELTA / ALPHA) * deltaT * accelerationOld;
 
 		speedOld = speedNew;
 		accelerationOld = accelerationNew;

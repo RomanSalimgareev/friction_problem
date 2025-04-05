@@ -24,13 +24,14 @@ bool writeDispAllNodes(const Matrix<Real>& displacements)
 	checkFileOpen(fout, isWrite);
 
 	const UnsignedType rows = displacements.sizeRows();
-	for (UnsignedType i = 0; i < rows; ++i)
+	for (UnsignedType rowNum = 0; rowNum < rows; ++rowNum)
 	{
-		if (displacements[i].size() >= 7)
+		if (displacements[rowNum].size() >= 7)
 		{
-			fout << "1: " << displacements[i][0] << "  " << "2: " << "  " <<
-				displacements[i][1] << "  " << "5: " << displacements[i][4] <<
-				"  " << "6: " << displacements[i][6] << "\n";
+			fout << "1: " << displacements[rowNum][0] << "  ";
+			fout << "2: " << displacements[rowNum][1] << "  ";
+			fout << "5: " << displacements[rowNum][4] << "  ";
+			fout << "6: " << displacements[rowNum][6] << "\n";
 		}
 		else
 		{
@@ -53,10 +54,10 @@ bool writeDispFirstNode(const Matrix<Real>& displacements)
 	checkFileOpen(fout, isWrite);
 
 	const UnsignedType rows = displacements.sizeRows();
-	for (UnsignedType i = 0; i < rows; ++i)
+	for (UnsignedType rowNum = 0; rowNum < rows; ++rowNum)
 	{
-		if (displacements[i].size() >= 1)
-			fout << displacements[i][0] << "\n";
+		if (displacements[rowNum].size() >= 1)
+			fout << displacements[rowNum][0] << "\n";
 		else
 		{
 			std::string msg = messageNotRecorded();
@@ -79,10 +80,10 @@ bool writeDispSecondNode(const Matrix<Real>& displacements)
 	checkFileOpen(fout, isWrite);
 
 	const UnsignedType rows = displacements.sizeRows();
-	for (UnsignedType i = 0; i < rows; ++i)
+	for (UnsignedType rowNum = 0; rowNum < rows; ++rowNum)
 	{
-		if (displacements[i].size() >= 2)
-			fout << displacements[i][1] << "\n";
+		if (displacements[rowNum].size() >= 2)
+			fout << displacements[rowNum][1] << "\n";
 		else
 		{
 			std::string msg = messageNotRecorded();
@@ -105,10 +106,10 @@ bool writeDispFifthNode(const Matrix<Real>& displacements)
 	checkFileOpen(fout, isWrite);
 
 	const UnsignedType rows = displacements.sizeRows();
-	for (UnsignedType i = 0; i < rows; ++i)
+	for (UnsignedType rowNum = 0; rowNum < rows; ++rowNum)
 	{
-		if (displacements[i].size() >= 5)
-			fout << displacements[i][4] << "\n";
+		if (displacements[rowNum].size() >= 5)
+			fout << displacements[rowNum][4] << "\n";
 		else
 		{
 			std::string msg = messageNotRecorded();
@@ -131,10 +132,10 @@ bool writeDispSixthNode(const Matrix<Real>& displacements)
 	checkFileOpen(fout, isWrite);
 
 	const UnsignedType rows = displacements.sizeRows();
-	for (UnsignedType i = 0; i < rows; ++i)
+	for (UnsignedType rowNum = 0; rowNum < rows; ++rowNum)
 	{
-		if (displacements[i].size() >= 7)
-			fout << displacements[i][6] << "\n";
+		if (displacements[rowNum].size() >= 7)
+			fout << displacements[rowNum][6] << "\n";
 		else
 		{
 			std::string msg = messageNotRecorded();
@@ -156,9 +157,9 @@ bool writeStepsTime(const UnsignedType& steps, const Real& deltaT)
 	std::ofstream fout("displacements.txt");
 	checkFileOpen(fout, isWrite);
 
-	for (UnsignedType i = 0; i < steps; ++i)
+	for (UnsignedType step = 0; step < steps; ++step)
 	{
-		fout << deltaT * i << "\n";
+		fout << deltaT * step << "\n";
 	}
 	fout.close();
 

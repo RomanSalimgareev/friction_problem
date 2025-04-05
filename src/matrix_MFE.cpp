@@ -242,26 +242,41 @@ RealMatrix makeMatrixElConst(const UnsignedType& rows,
 		ERROR(msg);
 	}
 
-	for (UnsignedType i = 0; i < rows; ++i)
+	for (UnsignedType rowNum = 0; rowNum < rows; ++rowNum)
 	{
-		for (UnsignedType j = 0; j < columns; ++j)
+		for (UnsignedType columnNum = 0; columnNum < columns; ++columnNum)
 		{
-			if (i < 3)
+			if (rowNum < 3)
 			{
-				if (i == j)
-					matrix[i][j] = modulusElastic * (1.0 - poissonRatio) /
-					((1.0 + poissonRatio) *
-						(1.0 - 2.0 * poissonRatio));
-				else if (j < 3)
-					matrix[i][j] = modulusElastic * poissonRatio /
-					((1.0 + poissonRatio) *
-						(1.0 - 2.0 * poissonRatio));
+				if (rowNum == columnNum)
+				{
+					matrix[rowNum][columnNum] =
+						modulusElastic * (1.0 - poissonRatio);
+
+					matrix[rowNum][columnNum] =
+						matrix[rowNum][columnNum] / (1.0 + poissonRatio);
+
+					matrix[rowNum][columnNum] = 
+						matrix[rowNum][columnNum] / (1.0 - 2.0 * poissonRatio);
+				}
+				else if (columnNum < 3)
+				{
+					matrix[rowNum][columnNum] = modulusElastic * poissonRatio;
+
+					matrix[rowNum][columnNum] = 
+						matrix[rowNum][columnNum] / (1.0 + poissonRatio);
+
+					matrix[rowNum][columnNum] =
+						matrix[rowNum][columnNum] / (1.0 - 2.0 * poissonRatio);
+				}
 			}
 			else
 			{
-				if (i == j)
-					matrix[i][j] = modulusElastic /
-					(2.0 * (1.0 + poissonRatio));
+				if (rowNum == columnNum)
+				{
+					matrix[rowNum][columnNum] =
+						modulusElastic / (2.0 * (1.0 + poissonRatio));
+				}
 			}
 		}
 	}
@@ -273,11 +288,12 @@ RealMatrix makeMatrixQuadPoints(const UnsignedType& rows,
 	const UnsignedType& columns, const RealMatrix& localCoordinate)
 {
 	RealMatrix matrix(rows, columns);
-	for (UnsignedType i = 0; i < rows; ++i)
+	for (UnsignedType rowNum = 0; rowNum < rows; ++rowNum)
 	{
-		for (UnsignedType j = 0; j < columns; ++j)
+		for (UnsignedType columnNum = 0; columnNum < columns; ++columnNum)
 		{
-			matrix[i][j] = sqrt(3.0) / 3.0 * localCoordinate[i][j];
+			matrix[rowNum][columnNum] = 
+				sqrt(3.0) / 3.0 * localCoordinate[rowNum][columnNum];
 		}
 	}
 	return matrix;
@@ -290,22 +306,32 @@ RealMatrix makeMatrixQuadPoints(const UnsignedType& rows,
 RealMatrix makeMatrixBtD(const RealMatrix& bTranspose,
 	const RealMatrix& elasticConstMatrix)
 {
-	const UnsignedType btColumns = bTranspose.sizeColumns();
+	const UnsignedType bTransposeRows = bTranspose.sizeRows();
 	const UnsignedType elasticRows = elasticConstMatrix.sizeRows();
-	if (btColumns != elasticRows)
+	if (bTranspose.sizeColumns() != elasticRows)
 	{
 		std::string msg = "Matrix size mismatch : cols(A) != rows(B). ";
 		ERROR(msg);
 	}
 
-	RealMatrix result(btColumns, elasticRows);
-	for (UnsignedType i = 0; i < btColumns; ++i)
+	if (elasticRows != elasticConstMatrix.sizeColumns())
 	{
-		for (UnsignedType j = 0; j < elasticRows; ++j)
+		std::string msg = "The matrix of elastic constants is not square";
+		ERROR(msg);
+	}
+
+	RealMatrix result(bTransposeRows, elasticRows);
+	for (UnsignedType rowBtNum = 0; rowBtNum < bTransposeRows; ++rowBtNum)
+	{
+		for (UnsignedType columnElasticNum = 0; columnElasticNum < elasticRows;
+			++columnElasticNum)
 		{
-			for (UnsignedType k = 0; k < elasticRows; ++k)
+			for (UnsignedType indexMultip = 0; indexMultip < elasticRows;
+				++indexMultip)
 			{
-				result[i][j] += bTranspose[k][i] * elasticConstMatrix[k][j];
+				result[rowBtNum][columnElasticNum] +=
+					bTranspose[rowBtNum][indexMultip] * 
+					elasticConstMatrix[indexMultip][columnElasticNum];
 			}
 		}
 	}
@@ -330,9 +356,9 @@ RealMatrix makeMatrixMassDiag(const UnsignedType& size,
 		ERROR(msg);
 	}
 
-	for (UnsignedType i = 0; i < size; ++i)
+	for (UnsignedType indexDiagonal = 0; indexDiagonal < size; ++indexDiagonal)
 	{
-		matrix[i][i] = mass / static_cast<Real>(nNodes);
+		matrix[indexDiagonal][indexDiagonal] = mass / static_cast<Real>(nNodes);
 	}
 	return matrix;
 }
@@ -361,38 +387,53 @@ RealMatrix makeMatrixMassJoint(const UnsignedType& size,
 		ERROR(msg);
 	}
 
-	for (UnsignedType i = 0; i < locCoordColumns; ++i)
+	for (UnsignedType nodeI = 0; nodeI < locCoordColumns; ++nodeI)
 	{
-		for (UnsignedType j = 0; j < locCoordColumns; ++j)
+		for (UnsignedType nodeJ = 0; nodeJ < locCoordColumns; ++nodeJ)
 		{
-			for (UnsignedType k = 0; k < locCoordColumns; ++k)
+			for (UnsignedType integPoint = 0; integPoint < locCoordColumns;
+				++integPoint)
 			{
 				// locCoord[0][i] - ksi, locCoord[1][i] - etta, 
 				// locCoord[2][i] - psi
-				Array3D locPoint{ locCoord[0][i], locCoord[1][i],
-					locCoord[2][i] };
+				Array3D locPoint
+				{ locCoord[0][nodeI],
+					locCoord[1][nodeI],
+					locCoord[2][nodeI] };
 
 				// quadPoints[0][k] - quadratic point ksi, 
 				// quadPoints[1][k] - quadratic point etta, 
 				// quadPoints[2][k] - quadratic point psi
-				Array3D quadPoint{ quadPoints[0][k], quadPoints[1][k],
-					quadPoints[2][k] };
+				Array3D quadPoint
+				{ quadPoints[0][integPoint],
+					quadPoints[1][integPoint],
+					quadPoints[2][integPoint] };
 
 				Real shapeFuncI = shapeFunction(locPoint, quadPoint);
 				Real shapeFuncJ = shapeFunction(locPoint, quadPoint);
 
-				ASSERT(3 * i < size && 3 * j < size, msg);
-				ASSERT((3 * i + 1) < size && (3 * j + 1) < size, msg);
-				ASSERT((3 * i + 2) < size && (3 * j + 2) < size, msg);
+				ASSERT(3 * nodeI < size && 3 * nodeJ < size, msg);
+				ASSERT((3 * nodeI + 1) < size && (3 * nodeJ + 1) < size, msg);
+				ASSERT((3 * nodeI + 2) < size && (3 * nodeJ + 2) < size, msg);
 
-				matrixMass[3 * i][3 * j] += shapeFuncI * shapeFuncJ;
-				matrixMass[3 * i + 1][3 * j + 1] += shapeFuncI * shapeFuncJ;
-				matrixMass[3 * i + 2][3 * j + 2] += shapeFuncI * shapeFuncJ;
+				matrixMass[3 * nodeI][3 * nodeJ] += 
+					shapeFuncI * shapeFuncJ;
+
+				matrixMass[3 * nodeI + 1][3 * nodeJ + 1] +=
+					shapeFuncI * shapeFuncJ;
+
+				matrixMass[3 * nodeI + 2][3 * nodeJ + 2] +=
+					shapeFuncI * shapeFuncJ;
 			}
 
-			matrixMass[3 * i][3 * j] *= detMatrixJacobian * dencity;
-			matrixMass[3 * i + 1][3 * j + 1] *= detMatrixJacobian * dencity;
-			matrixMass[3 * i + 2][3 * j + 2] *= detMatrixJacobian * dencity;
+			matrixMass[3 * nodeI][3 * nodeJ] *=
+				detMatrixJacobian * dencity;
+
+			matrixMass[3 * nodeI + 1][3 * nodeJ + 1] *=
+				detMatrixJacobian * dencity;
+
+			matrixMass[3 * nodeI + 2][3 * nodeJ + 2] *=
+				detMatrixJacobian * dencity;
 		}
 	}
 	return matrixMass;
@@ -421,78 +462,83 @@ RealMatrix makeMatrixStiffness(const FiniteElement& finiteElement)
 
 	const UnsignedType sizeStiffness = rowsLocCord * columnsQuad;
 	RealMatrix result(sizeStiffness, sizeStiffness);
-	for (UnsignedType l = 0; l < columnsQuad; l++)
+	for (UnsignedType integPoint = 0; integPoint < columnsQuad; integPoint++)
 	{
-		UnsignedType g = 0;
-		Array3D locPoint{ locCoord[0][g], locCoord[1][g],
-					locCoord[2][g] };
+		UnsignedType nodeLoc = 0;
+		Array3D locPoint{ locCoord[0][nodeLoc], locCoord[1][nodeLoc],
+					locCoord[2][nodeLoc] };
 
 		// construction of the differentiation matrix
 		RealMatrix matrixDifferentiation(rowsElastic, sizeStiffness);
-		for (UnsignedType k = 0; k < sizeStiffness - 2; k += 3)
+		for (UnsignedType indexNotZero = 0; indexNotZero < sizeStiffness - 2;
+			indexNotZero += 3)
 		{
-			locPoint = { locCoord[0][g], locCoord[1][g],
-					locCoord[2][g] };
+			locPoint = { locCoord[0][nodeLoc], locCoord[1][nodeLoc],
+					locCoord[2][nodeLoc] };
 
-			matrixDifferentiation[0][k] = 
-				dShapeFuncKsi(locPoint, quadPoints[1][l],
-				quadPoints[2][l], length);
+			matrixDifferentiation[0][indexNotZero] = 
+				dShapeFuncKsi(locPoint, quadPoints[1][integPoint],
+				quadPoints[2][integPoint], length);
 
-			matrixDifferentiation[1][k + 1] = 
-				dShapeFuncEtta(locPoint, quadPoints[0][l],
-				quadPoints[2][l], width);
+			matrixDifferentiation[1][indexNotZero + 1] = 
+				dShapeFuncEtta(locPoint, quadPoints[0][integPoint],
+				quadPoints[2][integPoint], width);
 
-			matrixDifferentiation[2][k + 2] = 
-				dShapeFuncPsi(locPoint, quadPoints[0][l],
-				quadPoints[1][l], heigth);
-			g++;
+			matrixDifferentiation[2][indexNotZero + 2] = 
+				dShapeFuncPsi(locPoint, quadPoints[0][integPoint],
+				quadPoints[1][integPoint], heigth);
+			nodeLoc++;
 		}
 
-		g = 0;
-		for (UnsignedType k = 0; k < sizeStiffness - 2; k += 3)
+		nodeLoc = 0;
+		for (UnsignedType indexNotZero = 0; indexNotZero < sizeStiffness - 2;
+			indexNotZero += 3)
 		{
-			locPoint = { locCoord[0][g], locCoord[1][g],
-			locCoord[2][g] };
+			locPoint = { locCoord[0][nodeLoc], locCoord[1][nodeLoc],
+			locCoord[2][nodeLoc] };
 
-			matrixDifferentiation[3][k] = 
-				dShapeFuncEtta(locPoint, quadPoints[0][l],
-				quadPoints[2][l], width);
+			matrixDifferentiation[3][indexNotZero] = 
+				dShapeFuncEtta(locPoint, quadPoints[0][integPoint],
+				quadPoints[2][integPoint], width);
 
-			matrixDifferentiation[3][k + 1] = 
-				dShapeFuncKsi(locPoint, quadPoints[1][l],
-				quadPoints[2][l], length);
-			g++;
+			matrixDifferentiation[3][indexNotZero + 1] = 
+				dShapeFuncKsi(locPoint, quadPoints[1][integPoint],
+				quadPoints[2][integPoint], length);
+			nodeLoc++;
 		}
 
-		g = 0;
-		for (UnsignedType k = 0; k < sizeStiffness - 2; k += 3)
+		nodeLoc = 0;
+		for (UnsignedType indexNotZero = 0; indexNotZero < sizeStiffness - 2;
+			indexNotZero += 3)
 		{
-			locPoint = { locCoord[0][g], locCoord[1][g],
-			locCoord[2][g] };
+			locPoint = { locCoord[0][nodeLoc], locCoord[1][nodeLoc],
+			locCoord[2][nodeLoc] };
 
-			matrixDifferentiation[4][k + 1] = 
-				dShapeFuncPsi(locPoint, quadPoints[0][l],
-				quadPoints[1][l], heigth);
+			matrixDifferentiation[4][indexNotZero + 1] = 
+				dShapeFuncPsi(locPoint, quadPoints[0][integPoint],
+				quadPoints[1][integPoint], heigth);
 
-			matrixDifferentiation[4][k + 2] = 
-				dShapeFuncEtta(locPoint, quadPoints[0][l],
-				quadPoints[2][l], width);
-			g++;
+			matrixDifferentiation[4][indexNotZero + 2] = 
+				dShapeFuncEtta(locPoint, quadPoints[0][integPoint],
+				quadPoints[2][integPoint], width);
+			nodeLoc++;
 		}
 
-		g = 0;
-		for (UnsignedType k = 0; k < sizeStiffness - 2; k += 3)
+		nodeLoc = 0;
+		for (UnsignedType indexNotZero = 0; indexNotZero < sizeStiffness - 2;
+			indexNotZero += 3)
 		{
-			locPoint = { locCoord[0][g], locCoord[1][g],
-			locCoord[2][g] };
+			locPoint = { locCoord[0][nodeLoc], locCoord[1][nodeLoc],
+			locCoord[2][nodeLoc] };
 
-			matrixDifferentiation[5][k] = 
-				dShapeFuncPsi(locPoint, quadPoints[0][l],
-				quadPoints[1][l], heigth);
-			matrixDifferentiation[5][k + 2] = 
-				dShapeFuncKsi(locPoint, quadPoints[1][l],
-				quadPoints[2][l], length);
-			g++;
+			matrixDifferentiation[5][indexNotZero] = 
+				dShapeFuncPsi(locPoint, quadPoints[0][integPoint],
+				quadPoints[1][integPoint], heigth);
+
+			matrixDifferentiation[5][indexNotZero + 2] = 
+				dShapeFuncKsi(locPoint, quadPoints[1][integPoint],
+				quadPoints[2][integPoint], length);
+			nodeLoc++;
 		}
 
 		RealMatrix matrixBt = transpose(matrixDifferentiation);
@@ -506,9 +552,10 @@ RealMatrix makeMatrixStiffness(const FiniteElement& finiteElement)
 			ERROR(msg);
 		}
 
-		for (UnsignedType i = 0; i < sizeStiffness; ++i)
+		for (UnsignedType rowNum = 0; rowNum < sizeStiffness; ++rowNum)
 		{
-			for (UnsignedType j = 0; j < sizeStiffness; ++j)
+			for (UnsignedType columnNum = 0; columnNum < sizeStiffness;
+				++columnNum)
 			{
 				Real product = 0;
 				if (matrixBtD.sizeColumns() < rowsElastic and
@@ -520,16 +567,18 @@ RealMatrix makeMatrixStiffness(const FiniteElement& finiteElement)
 
 				if (matrixBtD.sizeColumns() != matrixDifferentiation.sizeRows())
 				{
-					std::string msg = "Matrix size mismatch : cols(A) != rows(B). ";
+					std::string msg =
+						"Matrix size mismatch : cols(A) != rows(B). ";
 					ERROR(msg);
 				}
 
-				for (UnsignedType k = 0; k < rowsElastic; ++k)
+				for (UnsignedType indexMultip = 0; indexMultip < rowsElastic;
+					++indexMultip)
 				{
-					product += matrixBtD[i][k] *
-						matrixDifferentiation[k][j];
+					product += matrixBtD[rowNum][indexMultip] *
+						matrixDifferentiation[indexMultip][columnNum];
 				}
-				result[i][j] += product * detMatrixJacobian;
+				result[rowNum][columnNum] += product * detMatrixJacobian;
 			}
 		}
 	}

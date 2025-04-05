@@ -117,9 +117,7 @@ RealVector makeInitialAccel(const UnsignedType& size)
 // Applying symmetry conditions to symmetry nodes for a static problem
 void boundConditionStatic(RealMatrix& matrixStiffness)
 {
-	const std::vector<UnsignedType> indexs =
-	{ 1, 2, 5, 6, 8, 9, 10, 11, 13, 18, 21, 22 };
-	for (const auto& index : indexs)
+	for (const auto& index : INDICES_SYMMETRY_CONDITION)
 	{
 		bool isOutOfRange = index >= matrixStiffness.sizeRows() or
 			index >= matrixStiffness.sizeColumns();
@@ -139,52 +137,58 @@ void boundConditionStatic(RealMatrix& matrixStiffness)
 RealVector calculateDispStatic
 (const RealMatrix& matrixStiffness, const RealVector& force)
 {
-	const UnsignedType rows = matrixStiffness.sizeRows();
-	RealVector interimSolution(rows, 0.0);
+	const UnsignedType rowsStiffness = matrixStiffness.sizeRows();
+	RealVector interimSolution(rowsStiffness, 0.0);
 	RealMatrix matrixCholesky = createMatrixCholesky(matrixStiffness);
-	if (force.size() < rows)
+	if (force.size() < rowsStiffness)
 	{
 		std::string msg = "Vector size < matrix rows. ";
 		ERROR(msg);
 	}
 
-	for (UnsignedType i = 0; i < rows; ++i)
+	for (UnsignedType rowNum = 0; rowNum < rowsStiffness; ++rowNum)
 	{
 		Real sum = 0.0;
-		for (UnsignedType j = 0; j < i; ++j)
+		for (UnsignedType columnNum = 0; columnNum < rowNum; ++columnNum)
 		{
-			sum += matrixCholesky[i][j] * interimSolution[j];
+			sum += matrixCholesky[rowNum][columnNum] * 
+				interimSolution[columnNum];
 		}
 
-		if (matrixCholesky[i][i] <= DBL_EPSILON)
+		if (matrixCholesky[rowNum][rowNum] <= DBL_EPSILON)
 		{
 			std::string msg = messageDivideZero();
 			ERROR(msg);
 		}
 
-		interimSolution[i] = (force[i] - sum) / matrixCholesky[i][i];
+		interimSolution[rowNum] = (force[rowNum] - sum) /
+			matrixCholesky[rowNum][rowNum];
 	}
 
-	RealVector displacements(rows, 0.0);
+	RealVector displacements(rowsStiffness, 0.0);
 
-	UnsignedType i = rows;
-	while (i > 0)
+	UnsignedType rowsDisps = rowsStiffness;
+	while (rowsDisps > 0)
 	{
-		--i;
+		--rowsDisps;
 
 		Real sum = 0.0;
-		for (UnsignedType j = i + 1; j < rows; ++j)
+		for (UnsignedType columnNum = rowsDisps + 1; columnNum < rowsStiffness;
+			++columnNum)
 		{
-			sum += matrixCholesky[j][i] * displacements[j];
+			sum += matrixCholesky[columnNum][rowsDisps] * 
+				displacements[columnNum];
 		}
 
-		if (matrixCholesky[i][i] <= DBL_EPSILON)
+		if (matrixCholesky[rowsDisps][rowsDisps] <= DBL_EPSILON)
 		{
 			std::string msg = messageDivideZero();
 			ERROR(msg);
 		}
 
-		displacements[i] = (interimSolution[i] - sum) / matrixCholesky[i][i];
+		displacements[rowsDisps] = interimSolution[rowsDisps] - sum;
+		displacements[rowsDisps] = displacements[rowsDisps] /
+			matrixCholesky[rowsDisps][rowsDisps];
 	}
 	return displacements;
 }

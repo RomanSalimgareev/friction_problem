@@ -18,6 +18,8 @@ constexpr bool NO_DRIVE_FORCE_DRY = !HAS_DRIVE_FORCE_DRY;
 constexpr bool DRIVE_FORCE_DRY = true;
 constexpr bool DRIVE_FORCE_NO_DRY = !DRIVE_FORCE_DRY;
 constexpr std::array<UnsignedType, 4> ACTIVE_INDICES = { 0, 1, 4, 6 };
+constexpr std::array<UnsignedType, 8> INDICES_NORMAL_REACTION =
+{ 4, 7, 14, 16, 17, 19, 20, 23 };
 
 // The function of obtaining the amplitude of the driving force for dry
 // friction and viscous.

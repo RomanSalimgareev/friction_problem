@@ -19,11 +19,11 @@ std::ostream& operator << (const Matrix<T>& matrix,
 	const UnsignedType rows = matrix.sizeRows();
 	const UnsignedType columns = matrix.sizeColumns();
 
-	for (UnsignedType i = 0; i < rows; ++i)
+	for (UnsignedType rowNum = 0; rowNum < rows; ++rowNum)
 	{
-		for (UnsignedType j = 0; j < columns; ++j)
+		for (UnsignedType columnNum = 0; columnNum < columns; ++columnNum)
 		{
-			std::cout << matrix[i][j] << " ";
+			std::cout << matrix[rowNum][columnNum] << " ";
 		}
 		std::cout << "\n\n";
 	}
@@ -34,11 +34,11 @@ template <typename T>
 std::ostream& operator << (const std::vector<T>& vectorOutput,
 	std::ostream& out)
 {
-	const UnsignedType rows = vectorOutput.size();
+	const UnsignedType size = vectorOutput.size();
 
-	for (UnsignedType i = 0; i < rows; ++i)
+	for (UnsignedType index = 0; index < size; ++index)
 	{
-		std::cout << vectorOutput[i] << " ";
+		std::cout << vectorOutput[index] << " ";
 	}
 	return out;
 }
@@ -49,10 +49,10 @@ RealVector operator* (const Real& value,
 	const RealVector& vec)
 {
 	RealVector product = vec;
-	const UnsignedType s = vec.size();
-	for (UnsignedType i = 0; i < s; ++i)
+	const UnsignedType size = vec.size();
+	for (UnsignedType index = 0; index < size; ++index)
 	{
-		product[i] = value * vec[i];
+		product[index] = value * vec[index];
 	}
 	return product;
 }
@@ -60,11 +60,11 @@ RealVector operator* (const Real& value,
 RealVector operator* (const RealVector& vec,
 	const Real& value)
 {
-	UnsignedType s = vec.size();
-	RealVector product(s);
-	for (UnsignedType i = 0; i < s; ++i)
+	const UnsignedType size = vec.size();
+	RealVector product(size);
+	for (UnsignedType index = 0; index < size; ++index)
 	{
-		product[i] = value * vec[i];
+		product[index] = value * vec[index];
 	}
 	return product;
 }
@@ -79,9 +79,26 @@ RealVector& operator+= (RealVector& vectorFirst,
 		ERROR(msg);
 	}
 
-	for (UnsignedType i = 0; i < sizeSecond; ++i)
+	for (UnsignedType indexSecond = 0; indexSecond < sizeSecond; ++indexSecond)
 	{
-		vectorFirst[i] += vectorSecond[i];
+		vectorFirst[indexSecond] += vectorSecond[indexSecond];
+	}
+	return vectorFirst;
+}
+
+RealVector& operator-= (RealVector& vectorFirst,
+	const RealVector& vectorSecond)
+{
+	const UnsignedType sizeSecond = vectorSecond.size();
+	if (vectorFirst.size() < sizeSecond)
+	{
+		std::string msg = messageSizeFirstLess();
+		ERROR(msg);
+	}
+
+	for (UnsignedType indexSecond = 0; indexSecond < sizeSecond; ++indexSecond)
+	{
+		vectorFirst[indexSecond] -= vectorSecond[indexSecond];
 	}
 	return vectorFirst;
 }
@@ -97,9 +114,9 @@ RealVector operator+ (const RealVector& vectorFirst,
 		ERROR(msg);
 	}
 
-	for (UnsignedType i = 0; i < sizeSecond; ++i)
+	for (UnsignedType indexSecond = 0; indexSecond < sizeSecond; ++indexSecond)
 	{
-		result[i] += vectorSecond[i];
+		result[indexSecond] += vectorSecond[indexSecond];
 	}
 	return result;
 }
@@ -115,9 +132,9 @@ RealVector operator- (const RealVector& vectorFirst,
 		ERROR(msg);
 	}
 
-	for (UnsignedType i = 0; i < sizeSecond; ++i)
+	for (UnsignedType indexSecond = 0; indexSecond < sizeSecond; ++indexSecond)
 	{
-		result[i] -= vectorSecond[i];
+		result[indexSecond] -= vectorSecond[indexSecond];
 	}
 	return result;
 }
@@ -125,15 +142,22 @@ RealVector operator- (const RealVector& vectorFirst,
 RealVector operator* (const RealMatrix& matrix,
 	const RealVector& vec)
 {
-	const UnsignedType rows = matrix.sizeRows();
-	const UnsignedType columns = matrix.sizeColumns();
-	std::vector <Real> product(rows);
-
-	for (UnsignedType i = 0; i < rows; ++i)
+	const UnsignedType rowsMatrix = matrix.sizeRows();
+	const UnsignedType columnsMatrix = matrix.sizeColumns();
+	std::vector <Real> product(rowsMatrix);
+	if (vec.size() < columnsMatrix)
 	{
-		for (UnsignedType j = 0; j < columns; ++j)
+		std::string msg = "Vector size < סרהדüעû of the matrix";
+		ERROR(msg);
+	}
+
+	for (UnsignedType rowNum = 0; rowNum < rowsMatrix; ++rowNum)
+	{
+		for (UnsignedType columnNum = 0; columnNum < columnsMatrix;
+			++columnNum)
 		{
-			product[i] += matrix[i][j] * vec[j];
+			product[rowNum] +=
+				matrix[rowNum][columnNum] * vec[columnNum];
 		}
 	}
 	return product;
@@ -142,15 +166,22 @@ RealVector operator* (const RealMatrix& matrix,
 RealVector operator* (const RealVector& vec,
 	const RealMatrix& matrix)
 {
-	const UnsignedType rows = matrix.sizeRows();
-	const UnsignedType columns = matrix.sizeColumns();
-	std::vector <Real> product(rows);
-
-	for (UnsignedType i = 0; i < rows; ++i)
+	const UnsignedType rowsMatrix = matrix.sizeRows();
+	const UnsignedType columnsMatrix = matrix.sizeColumns();
+	std::vector <Real> product(columnsMatrix);
+	if (vec.size() < rowsMatrix)
 	{
-		for (UnsignedType j = 0; j < columns; ++j)
+		std::string msg = "Vector size < rows of the matrix";
+		ERROR(msg);
+	}
+
+	for (UnsignedType rowNum = 0; rowNum < rowsMatrix; ++rowNum)
+	{
+		for (UnsignedType columnNum = 0; columnNum < columnsMatrix;
+			++columnNum)
 		{
-			product[i] += matrix[i][j] * vec[j];
+			product[rowNum] +=
+				matrix[rowNum][columnNum] * vec[columnNum];
 		}
 	}
 	return product;
@@ -166,9 +197,9 @@ Real operator* (const RealVector& vectorFirst,
 		std::string msg = "The size of the vectors are not equal. ";
 		ERROR(msg);
 	}
-	for (UnsignedType i = 0; i < sizeSecond; ++i)
+	for (UnsignedType indexSecond = 0; indexSecond < sizeSecond; ++indexSecond)
 	{
-		product += vectorFirst[i] * vectorSecond[i];
+		product += vectorFirst[indexSecond] * vectorSecond[indexSecond];
 	}
 	return product;
 }
@@ -178,15 +209,15 @@ Real operator* (const RealVector& vectorFirst,
 RealMatrix operator* (const Real& value,
 	const RealMatrix& matrix)
 {
-	const UnsignedType r = matrix.sizeRows();
-	const UnsignedType c = matrix.sizeColumns();
-	RealMatrix product(r, c);
+	const UnsignedType rows = matrix.sizeRows();
+	const UnsignedType columns = matrix.sizeColumns();
+	RealMatrix product(rows, columns);
 
-	for (UnsignedType i = 0; i < r; ++i)
+	for (UnsignedType rowNum = 0; rowNum < rows; ++rowNum)
 	{
-		for (UnsignedType j = 0; j < c; ++j)
+		for (UnsignedType columnNum = 0; columnNum < columns; ++columnNum)
 		{
-			product[i][j] = matrix[i][j] * value;
+			product[rowNum][columnNum] = matrix[rowNum][columnNum] * value;
 		}
 	}
 	return product;
@@ -195,15 +226,15 @@ RealMatrix operator* (const Real& value,
 RealMatrix operator* (const RealMatrix& matrix,
 	const Real& value)
 {
-	const UnsignedType r = matrix.sizeRows();
-	const UnsignedType c = matrix.sizeColumns();
-	RealMatrix product(r, c);
+	const UnsignedType rows = matrix.sizeRows();
+	const UnsignedType columns = matrix.sizeColumns();
+	RealMatrix product(rows, columns);
 
-	for (UnsignedType i = 0; i < r; ++i)
+	for (UnsignedType rowNum = 0; rowNum < rows; ++rowNum)
 	{
-		for (UnsignedType j = 0; j < c; ++j)
+		for (UnsignedType columnNum = 0; columnNum < columns; ++columnNum)
 		{
-			product[i][j] = matrix[i][j] * value;
+			product[rowNum][columnNum] = matrix[rowNum][columnNum] * value;
 		}
 	}
 	return product;
@@ -213,21 +244,23 @@ RealMatrix operator+ (const RealMatrix& matrixFirst,
 	const RealMatrix& matrixSecond)
 {
 	RealMatrix result = matrixFirst;
-	const UnsignedType rows = matrixFirst.sizeRows();
-	const UnsignedType columns = matrixFirst.sizeColumns();
+	const UnsignedType rowsFirst = matrixFirst.sizeRows();
+	const UnsignedType columnsFirst = matrixFirst.sizeColumns();
 
-	if (matrixSecond.sizeRows() != rows and
-		matrixSecond.sizeColumns() != columns)
+	if (matrixSecond.sizeRows() != rowsFirst and
+		matrixSecond.sizeColumns() != columnsFirst)
 	{
 		std::string msg = messageSizeMatricestNotEqual();
 		ERROR(msg);
 	}
 
-	for (UnsignedType i = 0; i < rows; ++i)
+	for (UnsignedType rowFirst = 0; rowFirst < rowsFirst; ++rowFirst)
 	{
-		for (UnsignedType j = 0; j < columns; ++j)
+		for (UnsignedType columnFirst = 0; columnFirst < columnsFirst;
+			++columnFirst)
 		{
-			result[i][j] += matrixSecond[i][j];
+			result[rowFirst][columnFirst] +=
+				matrixSecond[rowFirst][columnFirst];
 		}
 	}
 
@@ -238,21 +271,23 @@ RealMatrix operator- (const RealMatrix& matrixFirst,
 	const RealMatrix& matrixSecond)
 {
 	RealMatrix result = matrixFirst;
-	const UnsignedType rows = matrixFirst.sizeRows();
-	const UnsignedType columns = matrixFirst.sizeColumns();
+	const UnsignedType rowsFirst = matrixFirst.sizeRows();
+	const UnsignedType columnsFirst = matrixFirst.sizeColumns();
 
-	if (matrixSecond.sizeRows() != rows and
-		matrixSecond.sizeColumns() != columns)
+	if (matrixSecond.sizeRows() != rowsFirst and
+		matrixSecond.sizeColumns() != columnsFirst)
 	{
 		std::string msg = messageSizeMatricestNotEqual();
 		ERROR(msg);
 	}
 
-	for (UnsignedType i = 0; i < rows; ++i)
+	for (UnsignedType rowFirst = 0; rowFirst < rowsFirst; ++rowFirst)
 	{
-		for (UnsignedType j = 0; j < columns; ++j)
+		for (UnsignedType columnFirst = 0; columnFirst < columnsFirst;
+			++columnFirst)
 		{
-			result[i][j] -= matrixSecond[i][j];
+			result[rowFirst][columnFirst] -=
+				matrixSecond[rowFirst][columnFirst];
 		}
 	}
 

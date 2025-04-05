@@ -31,7 +31,9 @@ public:
 
 	UnsignedType sizeColumns() const;
 
-	void eraseRowMatrix(const UnsignedType& index);
+	void eraseRow(const UnsignedType& index);
+
+	void eraseColumn(const UnsignedType& index);
 
 	bool empty() const;
 

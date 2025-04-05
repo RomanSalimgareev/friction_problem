@@ -259,10 +259,8 @@ void setForceNormReaction(RealVector& force,
 {
 	Real normalReaction = getNormReaction(isDriveForce);
 
-	std::vector<UnsignedType> indexsNormalReaction =
-	{ 4, 7, 14, 16, 17, 19, 20, 23 };
 	const UnsignedType sizeForce = force.size();
-	for (auto index : indexsNormalReaction)
+	for (auto index : INDICES_NORMAL_REACTION)
 	{
 		if (index < sizeForce)
 			force[index] = -1.0 * normalReaction;

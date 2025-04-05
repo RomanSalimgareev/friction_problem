@@ -41,12 +41,12 @@ int main()
 
 	try
 	{
-	// Matrix stiffness
-	RealMatrix matrixStiffness = makeMatrixStiffness(finiteElement);
+		// Matrix stiffness
+		RealMatrix matrixStiffness = makeMatrixStiffness(finiteElement);
 
-	UnsignedType rows = matrixStiffness.sizeRows();
-	// Diagonal matrix mass final element
-	RealMatrix matrixMassDiag = 
+		UnsignedType rows = matrixStiffness.sizeRows();
+		// Diagonal matrix mass final element
+		RealMatrix matrixMassDiag = 
 		makeMatrixMassDiag(rows, finiteElement);
 
 		RealMatrix displacements =

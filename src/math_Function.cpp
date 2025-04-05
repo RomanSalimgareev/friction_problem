@@ -3,37 +3,44 @@
 // Matrix Cholesky
 RealMatrix createMatrixCholesky(const RealMatrix& matrixStiffness)
 {
-	UnsignedType rowsStiffness = matrixStiffness.sizeRows();
-	if (rowsStiffness != matrixStiffness.sizeColumns())
+	UnsignedType matrixSize = matrixStiffness.sizeRows();
+	if (matrixSize != matrixStiffness.sizeColumns())
 	{
 		std::string msg = "The matrix is not square. ";
-		ASSERT(rowsStiffness == matrixStiffness.sizeColumns(), msg);
+		ASSERT(matrixSize == matrixStiffness.sizeColumns(), msg);
 		ERROR(msg);
 	}
 
-	RealMatrix matrixCholesky(rowsStiffness, rowsStiffness);
+	RealMatrix matrixCholesky(matrixSize, matrixSize);
 
-	for (UnsignedType i = 0; i < rowsStiffness; ++i) {
-		for (UnsignedType j = 0; j <= i; ++j) {
+	for (UnsignedType rowNum = 0; rowNum < matrixSize; ++rowNum) 
+	{
+		for (UnsignedType columnNum = 0; columnNum <= rowNum; ++columnNum) 
+		{
 			Real sum = 0;
-			if (j == i) {
-				for (UnsignedType k = 0; k < j; ++k) {
-					sum += pow(matrixCholesky[j][k], 2);
+			if (columnNum == rowNum) 
+			{
+				for (UnsignedType k = 0; k < columnNum; ++k) 
+				{
+					sum += pow(matrixCholesky[columnNum][k], 2);
 				}
-				matrixCholesky[j][j] = sqrt(matrixStiffness[j][j] - sum);
+				matrixCholesky[columnNum][columnNum] = 
+					sqrt(matrixStiffness[columnNum][columnNum] - sum);
 			}
-			else {
-				for (UnsignedType k = 0; k < j; ++k)
-					sum += (matrixCholesky[i][k] * matrixCholesky[j][k]);
+			else 
+			{
+				for (UnsignedType k = 0; k < columnNum; ++k)
+					sum += (matrixCholesky[rowNum][k] * matrixCholesky[columnNum][k]);
 
-				if (matrixCholesky[j][j] <= DBL_EPSILON)
+				if (matrixCholesky[columnNum][columnNum] <= DBL_EPSILON)
 				{
 					std::string msg = messageDivideZero();
 					ERROR(msg);
 				}
 
-				matrixCholesky[i][j] = 
-					(matrixStiffness[i][j] - sum) / matrixCholesky[j][j];
+				matrixCholesky[rowNum][columnNum] = 
+					(matrixStiffness[rowNum][columnNum] - sum) /
+						matrixCholesky[columnNum][columnNum];
 			}
 		}
 	}
@@ -48,11 +55,11 @@ RealMatrix transpose(const RealMatrix& noTranspose)
 	UnsignedType columns = noTranspose.sizeColumns();
 
 	RealMatrix new_matrix(columns, rows);
-	for (UnsignedType i = 0; i < columns; ++i)
+	for (UnsignedType columnNum = 0; columnNum < columns; ++columnNum)
 	{
-		for (UnsignedType j = 0; j < rows; ++j)
+		for (UnsignedType rowNum = 0; rowNum < rows; ++rowNum)
 		{
-			new_matrix[i][j] = noTranspose[j][i];
+			new_matrix[columnNum][rowNum] = noTranspose[rowNum][columnNum];
 		}
 	}
 	return new_matrix;
@@ -65,9 +72,9 @@ RealVector solveGauss(const RealMatrix& matrixCoefficients,
 {
 	const UnsignedType rows = matrixCoefficients.sizeRows();
 	const UnsignedType columns = matrixCoefficients.sizeColumns();
-	RealMatrix A = matrixCoefficients;
-	RealVector B = columnFreeMembers;
-	RealVector result(rows, 0.0);
+	RealMatrix coeffMatrix = matrixCoefficients;
+	RealVector freeTerms = columnFreeMembers;
+	RealVector solution(rows, 0.0);
 	if (columnFreeMembers.size() != rows)
 	{
 		std::string msg = "Vector size < matrix rows. ";
@@ -75,53 +82,67 @@ RealVector solveGauss(const RealMatrix& matrixCoefficients,
 		ERROR(msg);
 	}
 
-	for (UnsignedType i = 0; i < columns; ++i)
+	for (UnsignedType pivotColumn = 0; pivotColumn < columns; ++pivotColumn)
 	{
-		UnsignedType maxIndex = i;
-		for (UnsignedType j = i; j < rows; ++j)
+		UnsignedType pivotRow = pivotColumn;
+		for (UnsignedType rowNum = pivotColumn; rowNum < rows; ++rowNum)
 		{
-			if (abs(A[j][i]) > abs(A[maxIndex][i]))
+			if (abs(coeffMatrix[rowNum][pivotColumn]) >
+				abs(coeffMatrix[pivotRow][pivotColumn]))
 			{
-				maxIndex = j;
+				pivotRow = rowNum;
 			}
 		}
 
-		std::swap(A[i], A[maxIndex]);
-		std::swap(B[i], B[maxIndex]);
+		std::swap(coeffMatrix[pivotColumn], coeffMatrix[pivotRow]);
+		std::swap(freeTerms[pivotColumn], freeTerms[pivotRow]);
 
-		for (UnsignedType k = i; k < rows; ++k)
+		for (UnsignedType rowToEliminate = pivotColumn; rowToEliminate < rows;
+			++rowToEliminate)
 		{
-			Real firstCoefficient = A[k][i];
-			if (firstCoefficient <= DBL_EPSILON)
+			Real pivotValue = coeffMatrix[rowToEliminate][pivotColumn];
+			if (pivotValue <= DBL_EPSILON)
 			{
 				std::string msg = messageDivideZero();
 				ERROR(msg);
 			}
 
-			if (k == i)
-				B[k] = B[k] / firstCoefficient;
-			else
-				B[k] -= B[i] * firstCoefficient;
-
-			for (UnsignedType m = i; m < columns; ++m)
+			if (rowToEliminate == pivotColumn)
 			{
-				if (k == i)
-					A[k][m] = A[k][m] / firstCoefficient;
+				freeTerms[rowToEliminate] = freeTerms[rowToEliminate] /
+					pivotValue;
+			}
+			else
+			{
+				freeTerms[rowToEliminate] -= freeTerms[pivotColumn] *
+					pivotValue;
+			}
+
+			for (UnsignedType col = pivotColumn; col < columns; ++col)
+			{
+				if (rowToEliminate == pivotColumn)
+				{
+					coeffMatrix[rowToEliminate][col] =
+						coeffMatrix[rowToEliminate][col] / pivotValue;
+				}
 				else
-					A[k][m] -= A[i][m] * firstCoefficient;
+				{
+					coeffMatrix[rowToEliminate][col] -=
+						coeffMatrix[pivotColumn][col] * pivotValue;
+				}
 			}
 		}
 	}
 
-	for (UnsignedType i = rows; i-- > 0; )
+	for (UnsignedType rowNum = rows; rowNum-- > 0; )
 	{
 		Real sum = 0;
-		for (UnsignedType j = i + 1; j < rows; ++j)
+		for (UnsignedType columnNum = rowNum + 1; columnNum < rows; ++columnNum)
 		{
-			sum += result[j] * A[i][j];
+			sum += solution[columnNum] * coeffMatrix[rowNum][columnNum];
 		}
-		result[i] = B[i] - sum;
+		solution[rowNum] = freeTerms[rowNum] - sum;
 	}
 
-	return result;
+	return solution;
 }

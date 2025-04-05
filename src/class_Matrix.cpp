@@ -1,5 +1,15 @@
 #include "class_Matrix.h"
 
+std::string messageMatrixEmpty()
+{
+	return "The matrix is empty. ";
+}
+
+std::string messageInvalidArgument()
+{
+	return "Invalid argument. ";
+}
+
 template <typename T>
 Matrix<T>::Matrix() = default;
 
@@ -42,15 +52,35 @@ UnsignedType Matrix<T>::sizeColumns() const
 }
 
 template <typename T>
-void Matrix<T>::eraseRowMatrix(const UnsignedType& i)
+void Matrix<T>::eraseRow(const UnsignedType& index)
 {
-	if (i >= m_matrix.size())
+	if (m_matrix.empty())
+		ERROR(messageMatrixEmpty());
+	else
 	{
-		std::string msg = "Invalid argument. ";
-		ERROR(msg);
+		if (index >= m_matrix.size())
+			ERROR(messageInvalidArgument());
+		else
+			m_matrix.erase(m_matrix.begin() + index);
 	}
 
-	m_matrix.erase(m_matrix.begin() + i);
+}
+
+template <typename T>
+void Matrix<T>::eraseColumn(const UnsignedType& index)
+{
+	if (m_matrix.empty())
+		ERROR(messageMatrixEmpty());
+	else
+	{
+		for (UnsignedType rowNum = 0; rowNum < m_matrix.size(); ++rowNum)
+		{
+			if (index >= m_matrix[rowNum].size())
+				ERROR(messageInvalidArgument());
+			else
+				m_matrix[rowNum].erase(m_matrix[rowNum].begin() + index);
+		}
+	}
 }
 
 template <typename T>

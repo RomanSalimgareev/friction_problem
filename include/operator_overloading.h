@@ -35,6 +35,9 @@ RealVector operator* (const RealVector& vec,
 RealVector& operator+= (RealVector& vectorFirst,
 	const RealVector& vectorSecond);
 
+RealVector& operator-= (RealVector& vectorFirst,
+	const RealVector& vectorSecond);
+
 RealVector operator+ (const RealVector& vectorFirst,
 	const RealVector& vectorSecond);
 
