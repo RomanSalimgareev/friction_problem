@@ -2,7 +2,7 @@
 
 std::string messageFuncNotCalculate()
 {
-	return messageFuncNotCalculate();
+	return "The function did not calculate the value";
 }
 
 void checkIncorrectValue(Properties propertyFiniteElement, Real& value)
