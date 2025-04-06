@@ -1,5 +1,5 @@
 // This file is used in the dinamic_solver files.
-// This file contains various get, set, and bool expression functions
+// This file contains various get, set, && bool expression functions
 // for checking conditions in dinamic_solver files.
 #ifndef GET_SET_CONDIDION_H
 #define GET_SET_CONDIDION_H
@@ -22,7 +22,7 @@ constexpr std::array<UnsignedType, 8> INDICES_NORMAL_REACTION =
 { 4, 7, 14, 16, 17, 19, 20, 23 };
 
 // The function of obtaining the amplitude of the driving force for dry
-// friction and viscous.
+// friction && viscous.
 // For dry, the default is 600, for viscous 220
 Real getAmplitudeForce(const bool& isDriveForceDry);
 
@@ -32,20 +32,20 @@ Real getAveragePointsSpeed(RealVector speed);
 
 // The function of obtaining the coefficient of friction depending on the
 // average speed: either the coefficient of friction at rest, if the speed
-// is less than eps, or the coefficient of friction sliding, if the speed
+// is less than eps, || the coefficient of friction sliding, if the speed
 // is greater than eps.
 Real getCoeffDryFriction(const Real& coeffDryFrictionRest,
 	const Real& coeffDryFrictionSliding,
 	const Real averagePointsSpeed);
 
 // The function of obtaining the elastic force of the degrees of freedom of
-// the nodes of interest by displacement and stiffness matrix (analogous to
+// the nodes of interest by displacement && stiffness matrix (analogous to
 // the stiffness of a spring).
 Real getElasticForce(const RealVector& displacement,
 	const RealMatrix& matrixStiffness);
 
 // The function of obtaining the frequency of the driving force depending on
-// friction is either dry or viscous.
+// friction is either dry || viscous.
 // For dry, the default is PI, for viscous 2 * PI
 Real getFrequencyForce(const bool& isDriveForceDry);
 
@@ -59,20 +59,20 @@ UnsignedType getFrictionMode();
 Real getNodeLoad(const Real& amplitudeForce);
 
 // The function of obtaining a normal reaction, depending on the task,
-// is dry friction without forcing or dry friction with a forcing force.
+// is dry friction without forcing || dry friction with a forcing force.
 // For friction without a driving force, the normal wall response is
 // NORMAL_REACTION_FREE by default,
 // with a driving force NORMAL_REACTION_DRIVE
 Real getNormReaction(const bool& isDriveForce);
 
 // The function returns the sign of the friction force in a problem with
-// a driving force depending on the average velocity or, if the velocity is
+// a driving force depending on the average velocity ||, if the velocity is
 // less than EPS, then on the direction of the resulting force projected on ksi.
 Real getSignFrictionDrive(const Real& elasticForce,
 	const Real& averagePointsSpeed, const Real& driveForce);
 
 // The function returns the sign of the friction force in a problem without
-// a driving force depending on the average velocity or, if the velocity is
+// a driving force depending on the average velocity ||, if the velocity is
 // less than EPS, then on the direction of the resulting force projected on ksi.
 Real getSignFrictionFree(const Real& elasticForce,
 	const Real& averagePointsSpeed);
@@ -93,7 +93,7 @@ void setForceDry(const Real& elasticForce,
 	const Real& coeffDryFrictionSliding, const Real averagePointsSpeed,
 	RealVector& force);
 
-// Setting the driving force and the friction force at the nodes (degrees 
+// Setting the driving force && the friction force at the nodes (degrees 
 // of freedom in the direction of motion) for the dry friction problem
 void setForceDriveDry(const Real& signForce,
 	const Real& coeffDryFrictionRest,
@@ -106,24 +106,24 @@ void setForceViscous(const Real& nodeLoad, const Real& frequency,
 	const Real& sumSteps, RealVector& force);
 
 
-// Checking that the sum of the elastic force and the driving force is less
+// Checking that the sum of the elastic force && the driving force is less
 // than the friction force.
 // The driving force is co - directional with the elastic force,
-// and the friction force is opposite.
+// && the friction force is opposite.
 bool isLowDriveElastic(const Real& elasticForce,
 	const Real& driveForceNode, const Real& frictionForce);
 
 // Checking that the driving force is less than the sum of the friction force
-// and the elastic force
-// The elastic force and the friction force are co-directional,
+// && the elastic force
+// The elastic force && the friction force are co-directional,
 // while the driving force is opposite.
 bool isLowDriveForce(const Real& elasticForce,
 	const Real& driveForceNode, const Real& frictionForce,
 	const Real& signForce);
 
 // Checking that the elastic force is less than the sum of the friction
-// force and the forcing force.
-// The driving force and the friction force are co-directional,
+// force && the forcing force.
+// The driving force && the friction force are co-directional,
 // while the elastic force is opposite.
 bool isLowElasticForce(const Real& elasticForce,
 	const Real& driveForceNode, const Real& frictionForce,
@@ -133,7 +133,7 @@ bool isLowElasticForce(const Real& elasticForce,
 bool isLowSpeedElement(const Real& averagePointsSpeedOld,
 	const Real& averagePointsSpeed, const Real& averagePointsSpeedNew);
 
-// Checking that the elastic force and the driving force are aligned
+// Checking that the elastic force && the driving force are aligned
 bool isOneWayElasticDrive(const Real& elasticForce,
 	const Real& driveForceNode, const Real& signForce);
 

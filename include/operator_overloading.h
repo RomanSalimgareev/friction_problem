@@ -1,6 +1,6 @@
 // This file is used in the solver_utils files.
 // This file contains overloaded operators for the vector, the matrix class
-// and the output operator for the vector and the matrix class.
+// && the output operator for the vector && the matrix class.
 #ifndef OPERATOR_H
 #define OPERATOR_H
 

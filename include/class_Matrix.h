@@ -1,7 +1,7 @@
 // Its class Matrix, which contains 2 constructors: one creates a matrix based
-// on the number of rows and columns; the second creates a list using {}.
-// The matrix also returns the number of rows and columns,
-// and makes it possible to read or modify elements via [].
+// on the number of rows && columns; the second creates a list using {}.
+// The matrix also returns the number of rows && columns,
+// && makes it possible to read || modify elements via [].
 
 #ifndef CLASS_MATRIX_H
 #define CLASS_MATRIX_H

@@ -11,7 +11,7 @@ void checkIncorrectValue(Properties propertyFiniteElement, Real& value)
 	{
 	case PROPERTIES_MODULUS_ELASTIC:
 	{
-		while (value < MIN_DENCITY or value > MAX_DENCITY)
+		while (value < MIN_DENCITY || value > MAX_DENCITY)
 		{
 			std::cout << "Invalid finite element modulus of elasticity, "
 				"input the value again: \n";
@@ -21,7 +21,7 @@ void checkIncorrectValue(Properties propertyFiniteElement, Real& value)
 	}
 	case PROPERTIES_POISSONS_RATIO:
 	{
-		while (value <= DBL_EPSILON or value >= LIM_POISSONS_RATIO)
+		while (value <= DBL_EPSILON || value >= LIM_POISSONS_RATIO)
 		{
 			std::cout << "Invalid finite element poission's ratio, "
 				"input the value again: \n";
@@ -31,7 +31,7 @@ void checkIncorrectValue(Properties propertyFiniteElement, Real& value)
 	}
 	case PROPERTIES_DENCITY:
 	{
-		while (value < MIN_DENCITY or value > MAX_DENCITY)
+		while (value < MIN_DENCITY || value > MAX_DENCITY)
 		{
 			std::cout << "Invalid finite element dencity, "
 				"input the value again: \n";
@@ -108,13 +108,13 @@ void setMaterialProperties(FiniteElement& finiteElement)
 	checkIncorrectValue(PROPERTIES_HEIGTH, finiteElement.heigth);
 }
 
-// The choice of setting material properties: by default or manually
+// The choice of setting material properties: by default || manually
 void chooseMaterialProperties(FiniteElement& finiteElement)
 {
 	char choiceParameters = 'n';
 	std::cout << "Do you want to enter the parameters manually? (y/n) \n";
 	std::cin >> choiceParameters;
-	if (choiceParameters == 'y' or choiceParameters == 'Y')
+	if (choiceParameters == 'y' || choiceParameters == 'Y')
 		setMaterialProperties(finiteElement);
 	else
 		std::cout << "the parameters are selected by default: \n" <<
@@ -130,7 +130,7 @@ void chooseMaterialProperties(FiniteElement& finiteElement)
 Real shapeFunction(const Array3D& locPoint, const Array3D& quadPoint)
 {
 	Real result = 0.0;
-	const bool isCorrectData = locPoint.size() == 3 and
+	const bool isCorrectData = locPoint.size() == 3 &&
 		quadPoint.size() == 3;
 	if (isCorrectData)
 	{
@@ -154,7 +154,7 @@ Real dShapeFuncKsi(const Array3D& locPoint,
 	const Real& length)
 {
 	Real dKsi = 0.0;
-	const bool isCorrectData = locPoint.size() == 3 and
+	const bool isCorrectData = locPoint.size() == 3 &&
 		length >= MIN_SIZE_FINITE_ELEMENT;
 	if (isCorrectData)
 	{
@@ -178,7 +178,7 @@ Real dShapeFuncEtta(const Array3D& locPoint,
 	const Real& width)
 {
 	Real dEtta = 0.0;
-	const bool isCorrectData = locPoint.size() == 3 and
+	const bool isCorrectData = locPoint.size() == 3 &&
 		width >= MIN_SIZE_FINITE_ELEMENT;
 	if (isCorrectData)
 	{
@@ -201,7 +201,7 @@ Real dShapeFuncPsi(const Array3D& locPoint,
 	const Real& heigth)
 {
 	Real dPsi = 0.0;
-	const bool isCorrectData = locPoint.size() == 3 and
+	const bool isCorrectData = locPoint.size() == 3 &&
 		heigth >= MIN_SIZE_FINITE_ELEMENT;
 	if (isCorrectData)
 	{
@@ -236,7 +236,7 @@ RealMatrix makeMatrixElConst(const UnsignedType& rows,
 	RealMatrix matrix(rows, columns);
 	if (poissonRatio >= LIM_POISSONS_RATIO)
 	{
-		std::string msg = "The Poisson's ratio is greater than or "
+		std::string msg = "The Poisson's ratio is greater than || "
 			"equal to 0.5. ";
 		ASSERT(poissonRatio < LIM_POISSONS_RATIO, msg);
 		ERROR(msg);
@@ -302,7 +302,7 @@ RealMatrix makeMatrixQuadPoints(const UnsignedType& rows,
 // There "bt" - the transposed matrix b, where matrix b is the
 // matrix of differentiation from the finite element method;
 // D is the matrix of elastic constants, i.e. the matrix ElasticConst.
-// Its matrix product "bt" and "matrix of elastic constants".
+// Its matrix product "bt" && "matrix of elastic constants".
 RealMatrix makeMatrixBtD(const RealMatrix& bTranspose,
 	const RealMatrix& elasticConstMatrix)
 {
@@ -545,7 +545,7 @@ RealMatrix makeMatrixStiffness(const FiniteElement& finiteElement)
 		RealMatrix matrixBtD = makeMatrixBtD(matrixDifferentiation, ElasticConst);
 
 		// Obtaining the final stiffness matrix
-		if (matrixBtD.sizeRows() < sizeStiffness and
+		if (matrixBtD.sizeRows() < sizeStiffness &&
 			matrixDifferentiation.sizeColumns() < sizeStiffness)
 		{
 			std::string msg = messageOutOfRange();
@@ -558,7 +558,7 @@ RealMatrix makeMatrixStiffness(const FiniteElement& finiteElement)
 				++columnNum)
 			{
 				Real product = 0;
-				if (matrixBtD.sizeColumns() < rowsElastic and
+				if (matrixBtD.sizeColumns() < rowsElastic &&
 					matrixDifferentiation.sizeRows() < rowsElastic)
 				{
 					std::string msg = messageOutOfRange();

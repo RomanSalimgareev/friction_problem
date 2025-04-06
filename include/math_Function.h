@@ -1,7 +1,7 @@
-// This file is used in the initial_conditions files and and indirectly in the
+// This file is used in the initial_conditions files && && indirectly in the
 // files dinamic_solver.
 // This file contains mathematical functions : creating a Cholesky matrix for
-// solving a static problem, transposing, and solving by the Gauss method with
+// solving a static problem, transposing, && solving by the Gauss method with
 // the choice of a leading element.
 
 #ifndef MATH_FUNCTION_H

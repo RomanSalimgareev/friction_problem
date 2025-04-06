@@ -15,7 +15,7 @@ using UnsignedType = UnsignedType;
 
 // Writing to the file the movements of nodes 1, 2, 5, 6 in the direction of 
 // movement in a time step deltaT during time time.
-// rows is the number of rows of the displacement matrix, and displacements is
+// rows is the number of rows of the displacement matrix, && displacements is
 // the displacement matrix.
 bool writeDispAllNodes(const Matrix<Real>& displacements);
 

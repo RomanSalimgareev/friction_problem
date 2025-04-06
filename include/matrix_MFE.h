@@ -1,5 +1,5 @@
 // This file contains functions for constructing a stiffness matrix, a joint mass 
-// matrix and a diagonal mass matrix, as well as the functions for constructing
+// matrix && a diagonal mass matrix, as well as the functions for constructing
 // these matrices themselves.
 
 #ifndef MATRIX_MFE_H
@@ -55,12 +55,12 @@ struct FiniteElement
 // Input material properties manually
 void setMaterialProperties(FiniteElement& finiteElement);
 
-// The choice of setting material properties: by default or manually
+// The choice of setting material properties: by default || manually
 void chooseMaterialProperties(FiniteElement& finiteElement);
 
 // This function gives a matrix of local coordinates for an 8 - 
 // node parallelepiped, where 1 row is the ksi coordinates,
-// 2 row is the etta coordinates, and 3 row is the psi coordinates.
+// 2 row is the etta coordinates, && 3 row is the psi coordinates.
 RealMatrix getLocalCoordinate();
 
 // locCoord - these are the local coordinates of the point (ksi, etta, psi)
@@ -98,11 +98,11 @@ RealMatrix makeMatrixQuadPoints(const UnsignedType& rows,
 	const UnsignedType& columns, const RealMatrix& localCoordinate);
 
 // Its function creates a matrix that is the product of the transposed
-// differentiation matrix and the matrix of elastic constants
+// differentiation matrix && the matrix of elastic constants
 // There "bt" - the transposed matrix b, where matrix b is the
 // matrix of differentiation from the finite element method;
 // D is the matrix of elastic constants, i.e. the matrix ElasticConst.
-// Its matrix product "bt" and "matrix of elastic constants".
+// Its matrix product "bt" && "matrix of elastic constants".
 RealMatrix makeMatrixBtD(const RealMatrix& bTranspose,
 	const RealMatrix& elasticConstMatrix);
 

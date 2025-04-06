@@ -247,7 +247,7 @@ RealMatrix operator+ (const RealMatrix& matrixFirst,
 	const UnsignedType rowsFirst = matrixFirst.sizeRows();
 	const UnsignedType columnsFirst = matrixFirst.sizeColumns();
 
-	if (matrixSecond.sizeRows() != rowsFirst and
+	if (matrixSecond.sizeRows() != rowsFirst &&
 		matrixSecond.sizeColumns() != columnsFirst)
 	{
 		std::string msg = messageSizeMatricestNotEqual();
@@ -274,7 +274,7 @@ RealMatrix operator- (const RealMatrix& matrixFirst,
 	const UnsignedType rowsFirst = matrixFirst.sizeRows();
 	const UnsignedType columnsFirst = matrixFirst.sizeColumns();
 
-	if (matrixSecond.sizeRows() != rowsFirst and
+	if (matrixSecond.sizeRows() != rowsFirst &&
 		matrixSecond.sizeColumns() != columnsFirst)
 	{
 		std::string msg = messageSizeMatricestNotEqual();

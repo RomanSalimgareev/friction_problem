@@ -11,7 +11,7 @@ Real getAmplitudeForce(const bool& isDriveForceDry)
 			"driving force acting on the final element is 600, \n" <<
 			"do you want to change it(y / n) ? \n";
 		std::cin >> choiceAmplitude;
-		if (choiceAmplitude == 'y' or choiceAmplitude == 'Y')
+		if (choiceAmplitude == 'y' || choiceAmplitude == 'Y')
 			std::cin >> amplitudeForce;
 	}
 	else
@@ -22,7 +22,7 @@ Real getAmplitudeForce(const bool& isDriveForceDry)
 			"driving force acting on the final element is 220, " <<
 			"do you want to change it (y / n) ? \n";
 		std::cin >> choiceAmplitude;
-		if (choiceAmplitude == 'y' or choiceAmplitude == 'Y')
+		if (choiceAmplitude == 'y' || choiceAmplitude == 'Y')
 			std::cin >> amplitudeForce;
 	}
 
@@ -103,7 +103,7 @@ Real getFrequencyForce(const bool& isDriveForceDry)
 		std::cout << "The default value of a driving force frequency is PI, \n" <<
 			"do you want to change it (y/n)? \n";
 		std::cin >> choiceFrequency;
-		if (choiceFrequency == 'y' or choiceFrequency == 'Y')
+		if (choiceFrequency == 'y' || choiceFrequency == 'Y')
 		{
 			Real coefficientFrequency = 0.0;
 			std::cout << "Input the coefficient before the frequency " <<
@@ -119,7 +119,7 @@ Real getFrequencyForce(const bool& isDriveForceDry)
 		std::cout << "The default value of a driving force frequency " <<
 			"is 2 * PI, do you want to change it (y / n)? \n";
 		std::cin >> choiceFrequency;
-		if (choiceFrequency == 'y' or choiceFrequency == 'Y')
+		if (choiceFrequency == 'y' || choiceFrequency == 'Y')
 		{
 			Real coefficientFrequency = 0.0;
 			std::cout << "Input the coefficient before the frequency " <<
@@ -135,11 +135,11 @@ Real getFrequencyForce(const bool& isDriveForceDry)
 UnsignedType getFrictionMode()
 {
 	UnsignedType choice = 0;
-	std::cout << "Input 1 or 2, or 3, where 1 is oscillations without \n"
-		<< "a driving force, 2 is dry friction and 3 is viscous friction \n"
+	std::cout << "Input 1 || 2, || 3, where 1 is oscillations without \n"
+		<< "a driving force, 2 is dry friction && 3 is viscous friction \n"
 		<< "with driving force \n";
 
-	while (choice != 1 and choice != 2 and choice != 3)
+	while (choice != 1 && choice != 2 && choice != 3)
 		std::cin >> choice;
 
 	return choice;
@@ -170,7 +170,7 @@ Real getNormReaction(const bool& isDriveForce)
 			std::cout << "The default value of a normal reaction is 100, " <<
 				"do you want to change it (y/n)? \n";
 			std::cin >> choiceReaction;
-			if (choiceReaction == 'y' or choiceReaction == 'Y')
+			if (choiceReaction == 'y' || choiceReaction == 'Y')
 				std::cin >> normalReaction;
 			else
 				normalReaction = NORMAL_REACTION_DRIVE;
@@ -186,7 +186,7 @@ Real getNormReaction(const bool& isDriveForce)
 			std::cout << "The default value of a normal reaction is 400, \n" <<
 				"do you want to change it (y/n)? \n";
 			std::cin >> choiceReaction;
-			if (choiceReaction == 'y' or choiceReaction == 'Y')
+			if (choiceReaction == 'y' || choiceReaction == 'Y')
 				std::cin >> normalReaction;
 			else
 				normalReaction = NORMAL_REACTION_FREE;
@@ -202,14 +202,14 @@ Real getSignFrictionDrive(const Real& elasticForce,
 	const Real& averagePointsSpeed, const Real& driveForce)
 {
 	Real signForce = 0.0;
-	if (averagePointsSpeed > EPS or
-		(abs(averagePointsSpeed) < EPS and
+	if (averagePointsSpeed > EPS ||
+		(abs(averagePointsSpeed) < EPS &&
 			(4 * driveForce + elasticForce > 0.0)))
 	{
 		signForce = -1.0;
 	}
-	else if (averagePointsSpeed < -EPS or
-		(abs(averagePointsSpeed) < EPS and
+	else if (averagePointsSpeed < -EPS ||
+		(abs(averagePointsSpeed) < EPS &&
 			(4 * driveForce + elasticForce < 0.0)))
 	{
 		signForce = 1.0;
@@ -222,11 +222,11 @@ Real getSignFrictionFree(const Real& elasticForce,
 	const Real& averagePointsSpeed)
 {
 	Real signForce = 0.0;
-	if (averagePointsSpeed > EPS or
-		(abs(averagePointsSpeed) < EPS and elasticForce > 0.0))
+	if (averagePointsSpeed > EPS ||
+		(abs(averagePointsSpeed) < EPS && elasticForce > 0.0))
 		signForce = -1.0;
-	else if (averagePointsSpeed < -EPS or
-		(abs(averagePointsSpeed) < EPS and elasticForce < 0.0))
+	else if (averagePointsSpeed < -EPS ||
+		(abs(averagePointsSpeed) < EPS && elasticForce < 0.0))
 		signForce = 1.0;
 
 	return signForce;
@@ -290,7 +290,7 @@ void setForceDry(const Real& elasticForce,
 	{
 		if (index < sizeForce)
 		{
-			if (index == 1 or index == 4)
+			if (index == 1 || index == 4)
 				force[index] = signForce * coeffDryFriction * normalReaction;
 			else if (index == 6)
 				force[index] = 2.0 * signForce * coeffDryFriction * normalReaction;
@@ -322,7 +322,7 @@ void setForceDriveDry(const Real& signForce,
 		{
 			if (index == 0)
 				force[index] = driveForceNode;
-			else if (index == 1 or index == 4)
+			else if (index == 1 || index == 4)
 				force[index] = signForce * coeffDryFriction * normalReaction +
 				driveForceNode;
 			else
@@ -374,7 +374,7 @@ bool isLowDriveForce(const Real& elasticForce,
 	UnsignedType sizeIndices = ACTIVE_INDICES.size();
 	Real sizeCast = static_cast<Real> (sizeIndices);
 	return (abs(sizeCast * driveForceNode) -
-		abs(elasticForce + frictionForce)) < -EPS and
+		abs(elasticForce + frictionForce)) < -EPS &&
 		elasticForce * signForce >= 0.0;
 }
 
@@ -385,21 +385,21 @@ bool isLowElasticForce(const Real& elasticForce,
 	UnsignedType sizeIndices = ACTIVE_INDICES.size();
 	Real sizeCast = static_cast<Real> (sizeIndices);
 	return (abs(elasticForce) -
-		abs(sizeCast * driveForceNode + frictionForce) < -EPS) and
+		abs(sizeCast * driveForceNode + frictionForce) < -EPS) &&
 		driveForceNode * signForce >= 0.0;
 }
 
 bool isLowSpeedElement(const Real& averagePointsSpeedOld,
 	const Real& averagePointsSpeed, const Real& averagePointsSpeedNew)
 {
-	return abs(averagePointsSpeed) < EPS and
-		abs(averagePointsSpeedOld) < EPS and
+	return abs(averagePointsSpeed) < EPS &&
+		abs(averagePointsSpeedOld) < EPS &&
 		abs(averagePointsSpeedNew) < EPS;
 }
 
 bool isOneWayElasticDrive(const Real& elasticForce,
 	const Real& driveForceNode, const Real& signForce)
 {
-	return driveForceNode * signForce <= 0.0 and
+	return driveForceNode * signForce <= 0.0 &&
 		signForce * elasticForce <= 0.0;
 }

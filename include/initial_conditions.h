@@ -1,6 +1,6 @@
 // This file is used in the solver_utils files.
 // This file contains functions for setting kinematic initial conditions : 
-// initial displacements, initial velocities, and initial accelerations.
+// initial displacements, initial velocities, && initial accelerations.
 
 #ifndef INITIAL_PARAMETERS_H
 #define INITIAL_PARAMETERS_H
@@ -26,7 +26,7 @@ RealVector makeInitialStaticForce
 (const Real& initialForce, const UnsignedType& size);
 
 // The function of setting initial displacements by finding displacements from
-// a static task or manually setting displacements
+// a static task || manually setting displacements
 RealVector makeInitialDisps (RealMatrix matrixStiffness);
 
 // The function of setting the initial speeds manually.

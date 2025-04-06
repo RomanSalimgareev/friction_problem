@@ -4,7 +4,7 @@
 //	 The body is affected by comprehensive compression from the walls during the
 // entire movement process.
 //	 In addition, the program provides solvers for the problem of dry friction
-// without a driving force and viscous friction with a driving force to compare
+// without a driving force && viscous friction with a driving force to compare
 // the results. 
 //	 Next, the body is divided into 8 finite elements, after which,
 // for simplicity of calculations, only one (marked on the attached photo)
@@ -34,7 +34,7 @@ int main()
 	FiniteElement finiteElement;
 	chooseMaterialProperties(finiteElement);
 
-	// As well as the oscillation time and time step (for numerical integration)
+	// As well as the oscillation time && time step (for numerical integration)
 	Real time = 2.0;
 	// Up to 1e-14
 	Real deltaT = 1.0e-6;

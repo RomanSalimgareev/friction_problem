@@ -15,7 +15,7 @@ void boundConditionsDinamic(RealMatrix& matrixStiffness,
 		ERROR(msg);
 	}
 
-	bool isSizeEqual = rowsStiffness != matrixMass.sizeRows() and
+	bool isSizeEqual = rowsStiffness != matrixMass.sizeRows() &&
 		matrixStiffness.sizeColumns() != matrixMass.sizeColumns();
 
 	if (isSizeEqual == false)
@@ -24,7 +24,7 @@ void boundConditionsDinamic(RealMatrix& matrixStiffness,
 		ERROR(msg);
 	}
 
-	// The corresponding columns and rows are deleted
+	// The corresponding columns && rows are deleted
 	UnsignedType sizeIndicesSymmetry = INDICES_SYMMETRY_CONDITION.size();
 	for (UnsignedType index = sizeIndicesSymmetry - 1; index > 0; --index)
 	{
@@ -33,7 +33,7 @@ void boundConditionsDinamic(RealMatrix& matrixStiffness,
 		matrixStiffness.eraseRow(rowNum);
 		matrixMass.eraseRow(rowNum);
 
-		if (rowNum < speed.size() and rowNum < acceleration.size() and
+		if (rowNum < speed.size() && rowNum < acceleration.size() &&
 			rowNum < force.size())
 		{
 			speed.erase(speed.begin() + rowNum);
@@ -101,10 +101,10 @@ void dryFrictionFree(const UnsignedType& stepsCount, const Real& deltaT,
 		Real frictionForce = getSumFrictionForce(force);
 
 		bool isFrictionGreater = abs(elasticForce) <= abs(frictionForce);
-		bool isLowSpeed = abs(averagePointsSpeed) < EPS and
+		bool isLowSpeed = abs(averagePointsSpeed) < EPS &&
 			abs(averagePointsSpeedOld) < EPS;
 
-		if (isFrictionGreater and isLowSpeed)
+		if (isFrictionGreater && isLowSpeed)
 		{
 			// The knot is sticking
 			displacements[step + 1] = displacements[step];
@@ -220,11 +220,11 @@ void forcedDryFriction(const UnsignedType& stepsCount, const Real& deltaT,
 			isOneWayElasticDrive(elasticForce, driveForceNode, signForce);
 
 
-		bool driveElasticCondition = driveElForceCondition and
+		bool driveElasticCondition = driveElForceCondition &&
 			driveElSignCondition;
 
-		if (lowSpeedCondition and
-			(elasticForceCondition or driveForceCondition or
+		if (lowSpeedCondition &&
+			(elasticForceCondition || driveForceCondition ||
 				driveElasticCondition))
 		{
 			// The knot is sticking
@@ -250,7 +250,7 @@ void forcedDryFriction(const UnsignedType& stepsCount, const Real& deltaT,
 			RealVector differenceDisps =
 				displacements[step + 1] - displacements[step];
 
-			if (ALPHA == 0 or deltaT == 0)
+			if (ALPHA == 0 || deltaT == 0)
 			{
 				std::string msg = messageDivideZero();
 				ERROR(msg);
@@ -336,7 +336,7 @@ void viscousFrictionForce(const UnsignedType& stepsCount, const Real& deltaT,
 		RealVector differenceDisps =
 			displacements[step + 1] - displacements[step];
 
-		if (ALPHA == 0 or deltaT == 0)
+		if (ALPHA == 0 || deltaT == 0)
 		{
 			std::string msg = messageDivideZero();
 			ERROR(msg);

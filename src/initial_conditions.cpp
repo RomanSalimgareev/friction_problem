@@ -39,7 +39,7 @@ RealVector makeInitialDisps
 	std::cin >> choiceInitialDisp;
 
 	RealVector vectorInitial(size, 0.0);
-	if (choiceInitialDisp == 'y' or choiceInitialDisp == 'Y')
+	if (choiceInitialDisp == 'y' || choiceInitialDisp == 'Y')
 	{
 
 		boundConditionStatic(matrixStiffness);
@@ -119,7 +119,7 @@ void boundConditionStatic(RealMatrix& matrixStiffness)
 {
 	for (const auto& index : INDICES_SYMMETRY_CONDITION)
 	{
-		bool isOutOfRange = index >= matrixStiffness.sizeRows() or
+		bool isOutOfRange = index >= matrixStiffness.sizeRows() ||
 			index >= matrixStiffness.sizeColumns();
 		if (isOutOfRange)
 		{
