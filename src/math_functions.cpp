@@ -1,7 +1,10 @@
-#include "math_Function.h"
+#include "math_functions.h"
+#include "error_handling.h"
+
+using namespace MFE;
 
 // Matrix Cholesky
-RealMatrix createMatrixCholesky(const RealMatrix& matrixStiffness)
+RealMatrix MFE::createMatrixCholesky(const RealMatrix& matrixStiffness)
 {
 	UnsignedType matrixSize = matrixStiffness.sizeRows();
 	if (matrixSize != matrixStiffness.sizeColumns())
@@ -49,7 +52,7 @@ RealMatrix createMatrixCholesky(const RealMatrix& matrixStiffness)
 }
 
 // Transpose matrix
-RealMatrix transpose(const RealMatrix& noTranspose)
+RealMatrix MFE::transpose(const RealMatrix& noTranspose)
 {
 	UnsignedType rows = noTranspose.sizeRows();
 	UnsignedType columns = noTranspose.sizeColumns();
@@ -67,7 +70,7 @@ RealMatrix transpose(const RealMatrix& noTranspose)
 
 // Solving a system of linear equations by the Gauss method with
 // the choice of a leading element
-RealVector solveGauss(const RealMatrix& matrixCoefficients,
+RealVector MFE::solveGauss(const RealMatrix& matrixCoefficients,
 	const RealVector& columnFreeMembers)
 {
 	const UnsignedType rows = matrixCoefficients.sizeRows();

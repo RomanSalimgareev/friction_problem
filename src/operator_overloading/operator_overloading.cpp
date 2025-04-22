@@ -1,6 +1,8 @@
 // This file implements functions from the operator_overloading.h file.
-
 #include "operator_overloading.h"
+#include "error_handling.h"
+
+using namespace MFE;
 
 std::string messageSizeFirstLess()
 {
@@ -13,7 +15,7 @@ std::string messageSizeMatricestNotEqual()
 }
 
 template <typename T>
-std::ostream& operator << (const Matrix<T>& matrix,
+std::ostream& MFE::operator << (const Matrix<T>& matrix,
 	std::ostream& out)
 {
 	const UnsignedType rows = matrix.sizeRows();
@@ -31,7 +33,7 @@ std::ostream& operator << (const Matrix<T>& matrix,
 }
 
 template <typename T>
-std::ostream& operator << (const std::vector<T>& vectorOutput,
+std::ostream& MFE::operator << (const std::vector<T>& vectorOutput,
 	std::ostream& out)
 {
 	const UnsignedType size = vectorOutput.size();
@@ -45,7 +47,7 @@ std::ostream& operator << (const std::vector<T>& vectorOutput,
 
 ///////////////////////////////////////////////////////////
 
-RealVector operator* (const Real& value,
+RealVector MFE::operator* (const Real& value,
 	const RealVector& vec)
 {
 	RealVector product = vec;
@@ -57,7 +59,7 @@ RealVector operator* (const Real& value,
 	return product;
 }
 
-RealVector operator* (const RealVector& vec,
+RealVector MFE::operator* (const RealVector& vec,
 	const Real& value)
 {
 	const UnsignedType size = vec.size();
@@ -69,11 +71,11 @@ RealVector operator* (const RealVector& vec,
 	return product;
 }
 
-RealVector& operator+= (RealVector& vectorFirst,
-	const RealVector& vectorSecond)
+RealVector& MFE::operator+= (RealVector& vectorLhs,
+	const RealVector& vectorRhs)
 {
-	const UnsignedType sizeSecond = vectorSecond.size();
-	if (vectorFirst.size() < sizeSecond)
+	const UnsignedType sizeSecond = vectorRhs.size();
+	if (vectorLhs.size() < sizeSecond)
 	{
 		std::string msg = messageSizeFirstLess();
 		ERROR(msg);
@@ -81,16 +83,16 @@ RealVector& operator+= (RealVector& vectorFirst,
 
 	for (UnsignedType indexSecond = 0; indexSecond < sizeSecond; ++indexSecond)
 	{
-		vectorFirst[indexSecond] += vectorSecond[indexSecond];
+		vectorLhs[indexSecond] += vectorRhs[indexSecond];
 	}
-	return vectorFirst;
+	return vectorLhs;
 }
 
-RealVector& operator-= (RealVector& vectorFirst,
-	const RealVector& vectorSecond)
+RealVector& MFE::operator-= (RealVector& vectorLhs,
+	const RealVector& vectorRhs)
 {
-	const UnsignedType sizeSecond = vectorSecond.size();
-	if (vectorFirst.size() < sizeSecond)
+	const UnsignedType sizeSecond = vectorRhs.size();
+	if (vectorLhs.size() < sizeSecond)
 	{
 		std::string msg = messageSizeFirstLess();
 		ERROR(msg);
@@ -98,17 +100,17 @@ RealVector& operator-= (RealVector& vectorFirst,
 
 	for (UnsignedType indexSecond = 0; indexSecond < sizeSecond; ++indexSecond)
 	{
-		vectorFirst[indexSecond] -= vectorSecond[indexSecond];
+		vectorLhs[indexSecond] -= vectorRhs[indexSecond];
 	}
-	return vectorFirst;
+	return vectorLhs;
 }
 
-RealVector operator+ (const RealVector& vectorFirst,
-	const RealVector& vectorSecond)
+RealVector MFE::operator+ (const RealVector& vectorLhs,
+	const RealVector& vectorRhs)
 {
-	RealVector result = vectorFirst;
-	const UnsignedType sizeSecond = vectorSecond.size();
-	if (vectorFirst.size() < sizeSecond)
+	RealVector result = vectorLhs;
+	const UnsignedType sizeSecond = vectorRhs.size();
+	if (vectorLhs.size() < sizeSecond)
 	{
 		std::string msg = messageSizeFirstLess();
 		ERROR(msg);
@@ -116,17 +118,17 @@ RealVector operator+ (const RealVector& vectorFirst,
 
 	for (UnsignedType indexSecond = 0; indexSecond < sizeSecond; ++indexSecond)
 	{
-		result[indexSecond] += vectorSecond[indexSecond];
+		result[indexSecond] += vectorRhs[indexSecond];
 	}
 	return result;
 }
 
-RealVector operator- (const RealVector& vectorFirst,
-	const RealVector& vectorSecond)
+RealVector MFE::operator- (const RealVector& vectorLhs,
+	const RealVector& vectorRhs)
 {
-	RealVector result = vectorFirst;
-	const UnsignedType sizeSecond = vectorSecond.size();
-	if (vectorFirst.size() < sizeSecond)
+	RealVector result = vectorLhs;
+	const UnsignedType sizeSecond = vectorRhs.size();
+	if (vectorLhs.size() < sizeSecond)
 	{
 		std::string msg = messageSizeFirstLess();
 		ERROR(msg);
@@ -134,12 +136,30 @@ RealVector operator- (const RealVector& vectorFirst,
 
 	for (UnsignedType indexSecond = 0; indexSecond < sizeSecond; ++indexSecond)
 	{
-		result[indexSecond] -= vectorSecond[indexSecond];
+		result[indexSecond] -= vectorRhs[indexSecond];
 	}
 	return result;
 }
 
-RealVector operator* (const RealMatrix& matrix,
+
+Real MFE::operator* (const RealVector& vectorLhs,
+	const RealVector& vectorRhs)
+{
+	Real product = 0;
+	const UnsignedType sizeSecond = vectorRhs.size();
+	if (vectorLhs.size() != sizeSecond)
+	{
+		std::string msg = "The size of the vectors are not equal. ";
+		ERROR(msg);
+	}
+	for (UnsignedType indexSecond = 0; indexSecond < sizeSecond; ++indexSecond)
+	{
+		product += vectorLhs[indexSecond] * vectorRhs[indexSecond];
+	}
+	return product;
+}
+
+RealVector MFE::operator* (const RealMatrix& matrix,
 	const RealVector& vec)
 {
 	const UnsignedType rowsMatrix = matrix.sizeRows();
@@ -163,7 +183,7 @@ RealVector operator* (const RealMatrix& matrix,
 	return product;
 }
 
-RealVector operator* (const RealVector& vec,
+RealVector MFE::operator* (const RealVector& vec,
 	const RealMatrix& matrix)
 {
 	const UnsignedType rowsMatrix = matrix.sizeRows();
@@ -187,26 +207,9 @@ RealVector operator* (const RealVector& vec,
 	return product;
 }
 
-Real operator* (const RealVector& vectorFirst,
-	const RealVector& vectorSecond)
-{
-	Real product = 0;
-	const UnsignedType sizeSecond = vectorSecond.size();
-	if (vectorFirst.size() != sizeSecond)
-	{
-		std::string msg = "The size of the vectors are not equal. ";
-		ERROR(msg);
-	}
-	for (UnsignedType indexSecond = 0; indexSecond < sizeSecond; ++indexSecond)
-	{
-		product += vectorFirst[indexSecond] * vectorSecond[indexSecond];
-	}
-	return product;
-}
-
 ///////////////////////////////////////////////////////////
 
-RealMatrix operator* (const Real& value,
+RealMatrix MFE::operator* (const Real& value,
 	const RealMatrix& matrix)
 {
 	const UnsignedType rows = matrix.sizeRows();
@@ -223,7 +226,7 @@ RealMatrix operator* (const Real& value,
 	return product;
 }
 
-RealMatrix operator* (const RealMatrix& matrix,
+RealMatrix MFE::operator* (const RealMatrix& matrix,
 	const Real& value)
 {
 	const UnsignedType rows = matrix.sizeRows();
@@ -240,15 +243,15 @@ RealMatrix operator* (const RealMatrix& matrix,
 	return product;
 }
 
-RealMatrix operator+ (const RealMatrix& matrixFirst,
-	const RealMatrix& matrixSecond)
+RealMatrix MFE::operator+ (const RealMatrix& matrixLhs,
+	const RealMatrix& matrixRhs)
 {
-	RealMatrix result = matrixFirst;
-	const UnsignedType rowsFirst = matrixFirst.sizeRows();
-	const UnsignedType columnsFirst = matrixFirst.sizeColumns();
+	RealMatrix result = matrixLhs;
+	const UnsignedType rowsFirst = matrixLhs.sizeRows();
+	const UnsignedType columnsFirst = matrixLhs.sizeColumns();
 
-	if (matrixSecond.sizeRows() != rowsFirst &&
-		matrixSecond.sizeColumns() != columnsFirst)
+	if (matrixRhs.sizeRows() != rowsFirst &&
+		matrixRhs.sizeColumns() != columnsFirst)
 	{
 		std::string msg = messageSizeMatricestNotEqual();
 		ERROR(msg);
@@ -260,22 +263,22 @@ RealMatrix operator+ (const RealMatrix& matrixFirst,
 			++columnFirst)
 		{
 			result[rowFirst][columnFirst] +=
-				matrixSecond[rowFirst][columnFirst];
+				matrixRhs[rowFirst][columnFirst];
 		}
 	}
 
 	return result;
 }
 
-RealMatrix operator- (const RealMatrix& matrixFirst,
-	const RealMatrix& matrixSecond)
+RealMatrix MFE::operator- (const RealMatrix& matrixLhs,
+	const RealMatrix& matrixRhs)
 {
-	RealMatrix result = matrixFirst;
-	const UnsignedType rowsFirst = matrixFirst.sizeRows();
-	const UnsignedType columnsFirst = matrixFirst.sizeColumns();
+	RealMatrix result = matrixLhs;
+	const UnsignedType rowsFirst = matrixLhs.sizeRows();
+	const UnsignedType columnsFirst = matrixLhs.sizeColumns();
 
-	if (matrixSecond.sizeRows() != rowsFirst &&
-		matrixSecond.sizeColumns() != columnsFirst)
+	if (matrixRhs.sizeRows() != rowsFirst &&
+		matrixRhs.sizeColumns() != columnsFirst)
 	{
 		std::string msg = messageSizeMatricestNotEqual();
 		ERROR(msg);
@@ -287,7 +290,7 @@ RealMatrix operator- (const RealMatrix& matrixFirst,
 			++columnFirst)
 		{
 			result[rowFirst][columnFirst] -=
-				matrixSecond[rowFirst][columnFirst];
+				matrixRhs[rowFirst][columnFirst];
 		}
 	}
 

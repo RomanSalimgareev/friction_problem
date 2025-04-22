@@ -6,7 +6,6 @@
 #include <string>
 #include <ctime>
 
-#define NDEBUG
 
 #ifdef NDEBUG
 	#define ASSERT(cond, msg) ((void)0)

@@ -1,6 +1,9 @@
 #include "initial_conditions.h"
+#include "error_handling.h"
 
-RealVector makeInitialStaticForce(const Real& initialForce,
+using namespace MFE;
+
+RealVector MFE::makeInitialStaticForce(const Real& initialForce,
 	const UnsignedType& size)
 {
 	RealVector vectorInitial(size, 0.0);
@@ -29,7 +32,7 @@ RealVector makeInitialStaticForce(const Real& initialForce,
 	return vectorInitial;
 }
 
-RealVector makeInitialDisps 
+RealVector MFE::makeInitialDisps
 (RealMatrix matrixStiffness)
 {
 	const UnsignedType size = matrixStiffness.sizeRows();
@@ -62,7 +65,7 @@ RealVector makeInitialDisps
 	return vectorInitial;
 }
 
-RealVector makeInitialSpeed(const UnsignedType& size)
+RealVector MFE::makeInitialSpeed(const UnsignedType& size)
 {
 	RealVector vectorInitial(size, 0.0);
 	Real speed = 0.0;
@@ -88,7 +91,7 @@ RealVector makeInitialSpeed(const UnsignedType& size)
 	return vectorInitial;
 }
 
-RealVector makeInitialAccel(const UnsignedType& size)
+RealVector MFE::makeInitialAccel(const UnsignedType& size)
 {
 	RealVector vectorInitial(size, 0.0);
 	Real acceleration = 0.0;
@@ -115,7 +118,7 @@ RealVector makeInitialAccel(const UnsignedType& size)
 }
 
 // Applying symmetry conditions to symmetry nodes for a static problem
-void boundConditionStatic(RealMatrix& matrixStiffness)
+void MFE::boundConditionStatic(RealMatrix& matrixStiffness)
 {
 	for (const auto& index : INDICES_SYMMETRY_CONDITION)
 	{
@@ -134,7 +137,7 @@ void boundConditionStatic(RealMatrix& matrixStiffness)
 }
 
 // Solver for a static problem
-RealVector calculateDispStatic
+RealVector MFE::calculateDispStatic
 (const RealMatrix& matrixStiffness, const RealVector& force)
 {
 	const UnsignedType rowsStiffness = matrixStiffness.sizeRows();

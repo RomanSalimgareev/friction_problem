@@ -1,4 +1,7 @@
-#include "write_function.h"
+#include "write_functions.h"
+#include "error_handling.h"
+
+using namespace MFE;
 
 std::string messageNotRecorded()
 {
@@ -17,7 +20,7 @@ void checkFileOpen(std::ofstream& fout, bool& isWrite)
 	std::cout << "File is not open. \n";
 }
 
-bool writeDispAllNodes(const Matrix<Real>& displacements)
+bool MFE::writeDispAllNodes(const RealMatrix& displacements)
 {
 	bool isWrite = true;
 	std::ofstream fout("displacements.txt");
@@ -47,7 +50,7 @@ bool writeDispAllNodes(const Matrix<Real>& displacements)
 	return isWrite;
 }
 
-bool writeDispFirstNode(const Matrix<Real>& displacements)
+bool MFE::writeDispFirstNode(const RealMatrix& displacements)
 {
 	bool isWrite = true;
 	std::ofstream fout("displacements.txt");
@@ -73,7 +76,7 @@ bool writeDispFirstNode(const Matrix<Real>& displacements)
 	return isWrite;
 }
 
-bool writeDispSecondNode(const Matrix<Real>& displacements)
+bool MFE::writeDispSecondNode(const RealMatrix& displacements)
 {
 	bool isWrite = true;
 	std::ofstream fout("displacements.txt");
@@ -99,7 +102,7 @@ bool writeDispSecondNode(const Matrix<Real>& displacements)
 	return isWrite;
 }
 
-bool writeDispFifthNode(const Matrix<Real>& displacements)
+bool MFE::writeDispFifthNode(const RealMatrix& displacements)
 {
 	bool isWrite = true;
 	std::ofstream fout("displacements.txt");
@@ -125,7 +128,7 @@ bool writeDispFifthNode(const Matrix<Real>& displacements)
 	return isWrite;
 }
 
-bool writeDispSixthNode(const Matrix<Real>& displacements)
+bool MFE::writeDispSixthNode(const RealMatrix& displacements)
 {
 	bool isWrite = true;
 	std::ofstream fout("displacements.txt");
@@ -151,7 +154,7 @@ bool writeDispSixthNode(const Matrix<Real>& displacements)
 	return isWrite;
 }
 
-bool writeStepsTime(const UnsignedType& steps, const Real& deltaT)
+bool MFE::writeStepsTime(const UnsignedType& steps, const Real& deltaT)
 {
 	bool isWrite = true;
 	std::ofstream fout("displacements.txt");

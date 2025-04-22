@@ -1,4 +1,7 @@
 #include "matrix_MFE.h"
+#include "error_handling.h"
+
+using namespace MFE;
 
 std::string messageFuncNotCalculate()
 {
@@ -79,7 +82,7 @@ void checkIncorrectValue(Properties propertyFiniteElement, Real& value)
 }
 
 // Input material properties manually
-void setMaterialProperties(FiniteElement& finiteElement)
+void MFE::setMaterialProperties(FiniteElement& finiteElement)
 {
 	std::cout << "Input modulus elastic: " << "\n";
 	std::cin >> finiteElement.modulusElastic;
@@ -109,7 +112,7 @@ void setMaterialProperties(FiniteElement& finiteElement)
 }
 
 // The choice of setting material properties: by default || manually
-void chooseMaterialProperties(FiniteElement& finiteElement)
+void MFE::chooseMaterialProperties(FiniteElement& finiteElement)
 {
 	char choiceParameters = 'n';
 	std::cout << "Do you want to enter the parameters manually? (y/n) \n";
@@ -127,7 +130,7 @@ void chooseMaterialProperties(FiniteElement& finiteElement)
 }
 
 // The shape function
-Real shapeFunction(const Array3D& locPoint, const Array3D& quadPoint)
+Real MFE::shapeFunction(const Array3D& locPoint, const Array3D& quadPoint)
 {
 	Real result = 0.0;
 	const bool isCorrectData = locPoint.size() == 3 &&
@@ -149,7 +152,7 @@ Real shapeFunction(const Array3D& locPoint, const Array3D& quadPoint)
 }
 
 // The derivative of the shape function by ksi
-Real dShapeFuncKsi(const Array3D& locPoint,
+Real MFE::dShapeFuncKsi(const Array3D& locPoint,
 	const Real& quadraticPointEtta, const Real& quadraticPointPsi,
 	const Real& length)
 {
@@ -173,7 +176,7 @@ Real dShapeFuncKsi(const Array3D& locPoint,
 }
 
 // The derivative of the shape function by etta
-Real dShapeFuncEtta(const Array3D& locPoint,
+Real MFE::dShapeFuncEtta(const Array3D& locPoint,
 	const Real& quadraticPointKsi, const Real& quadraticPointPsi,
 	const Real& width)
 {
@@ -196,7 +199,7 @@ Real dShapeFuncEtta(const Array3D& locPoint,
 }
 
 // The derivative of the shape function by psi
-Real dShapeFuncPsi(const Array3D& locPoint,
+Real MFE::dShapeFuncPsi(const Array3D& locPoint,
 	const Real& quadraticPointKsi, const Real& quadraticPointEtta,
 	const Real& heigth)
 {
@@ -219,7 +222,7 @@ Real dShapeFuncPsi(const Array3D& locPoint,
 }
 
 // This function creates a matrix of local coordinates
-RealMatrix getLocalCoordinate()
+RealMatrix MFE::getLocalCoordinate()
 {
 	RealMatrix matrix = { {1.0 ,1.0 ,-1.0, -1.0, 1.0, 1.0, -1.0, -1.0 },
 		{ -1.0, 1.0, 1.0, -1.0, -1.0, 1.0, 1.0, -1.0 },
@@ -229,7 +232,7 @@ RealMatrix getLocalCoordinate()
 }
 
 // Its function creates a elastic constants matrix
-RealMatrix makeMatrixElConst(const UnsignedType& rows,
+RealMatrix MFE::makeMatrixElConst(const UnsignedType& rows,
 	const UnsignedType& columns, const Real& modulusElastic,
 	const Real& poissonRatio)
 {
@@ -284,7 +287,7 @@ RealMatrix makeMatrixElConst(const UnsignedType& rows,
 }
 
 // Its function creates a matrix of quadratic points
-RealMatrix makeMatrixQuadPoints(const UnsignedType& rows,
+RealMatrix MFE::makeMatrixQuadPoints(const UnsignedType& rows,
 	const UnsignedType& columns, const RealMatrix& localCoordinate)
 {
 	RealMatrix matrix(rows, columns);
@@ -303,7 +306,7 @@ RealMatrix makeMatrixQuadPoints(const UnsignedType& rows,
 // matrix of differentiation from the finite element method;
 // D is the matrix of elastic constants, i.e. the matrix ElasticConst.
 // Its matrix product "bt" && "matrix of elastic constants".
-RealMatrix makeMatrixBtD(const RealMatrix& bTranspose,
+RealMatrix MFE::makeMatrixBtD(const RealMatrix& bTranspose,
 	const RealMatrix& elasticConstMatrix)
 {
 	const UnsignedType bTransposeRows = bTranspose.sizeRows();
@@ -339,7 +342,7 @@ RealMatrix makeMatrixBtD(const RealMatrix& bTranspose,
 }
 
 // This function creates a diagonal mass matrix.
-RealMatrix makeMatrixMassDiag(const UnsignedType& size,
+RealMatrix MFE::makeMatrixMassDiag(const UnsignedType& size,
 	const FiniteElement& finiteElement)
 {
 	RealMatrix matrix(size, size);
@@ -364,7 +367,7 @@ RealMatrix makeMatrixMassDiag(const UnsignedType& size,
 }
 
 // This function creates a joint mass matrix.
-RealMatrix makeMatrixMassJoint(const UnsignedType& size,
+RealMatrix MFE::makeMatrixMassJoint(const UnsignedType& size,
 	const FiniteElement& finiteElement)
 {
 	const Real length = finiteElement.length;
@@ -440,7 +443,7 @@ RealMatrix makeMatrixMassJoint(const UnsignedType& size,
 }
 
 // This function creates a matrix stiffness.
-RealMatrix makeMatrixStiffness(const FiniteElement& finiteElement)
+RealMatrix MFE::makeMatrixStiffness(const FiniteElement& finiteElement)
 {
 	const Real length = finiteElement.length;
 	const Real width = finiteElement.width;

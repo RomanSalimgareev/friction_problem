@@ -1,4 +1,7 @@
-#include "class_Matrix.h"
+#include "class_matrix.h"
+#include "error_handling.h"
+
+using namespace MFE;
 
 std::string messageMatrixEmpty()
 {

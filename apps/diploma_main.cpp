@@ -27,7 +27,9 @@
 
 #include "dinamic_solver_MFE.h"
 #include "matrix_MFE.h"
-#include "write_function.h"
+#include "write_functions.h"
+
+using namespace MFE;
 
 int main()
 {

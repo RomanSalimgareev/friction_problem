@@ -1,7 +1,11 @@
 #include "dinamic_solver_MFE.h"
+#include "error_handling.h"
+#include "operator_overloading.h"
+
+using namespace MFE;
 
 // Applying symmetry conditions to symmetry nodes for a dynamic problem
-void boundConditionsDinamic(RealMatrix& matrixStiffness,
+void MFE::boundConditionsDinamic(RealMatrix& matrixStiffness,
 	RealMatrix& matrixMass, RealMatrix& displacements,
 	RealVector& speed, RealVector& acceleration,
 	RealVector& force)
@@ -58,7 +62,7 @@ void boundConditionsDinamic(RealMatrix& matrixStiffness,
 }
 
 // A function that solves the problem of dry friction without forcing force.
-void dryFrictionFree(const UnsignedType& stepsCount, const Real& deltaT,
+void MFE::dryFrictionFree(const UnsignedType& stepsCount, const Real& deltaT,
 	RealMatrix& matrixStiffness, RealMatrix& matrixMass,
 	RealMatrix& displacements)
 {
@@ -143,7 +147,7 @@ void dryFrictionFree(const UnsignedType& stepsCount, const Real& deltaT,
 }
 
 // A function that solves the problem of dry friction with a driving force
-void forcedDryFriction(const UnsignedType& stepsCount, const Real& deltaT,
+void MFE::forcedDryFriction(const UnsignedType& stepsCount, const Real& deltaT,
 	RealMatrix& matrixStiffness, RealMatrix& matrixMass,
 	RealMatrix& displacements)
 {
@@ -274,7 +278,7 @@ void forcedDryFriction(const UnsignedType& stepsCount, const Real& deltaT,
 	}
 }
 
-void viscousFrictionForce(const UnsignedType& stepsCount, const Real& deltaT,
+void MFE::viscousFrictionForce(const UnsignedType& stepsCount, const Real& deltaT,
 	RealMatrix& matrixStiffness, RealMatrix& matrixMass,
 	RealMatrix& displacements)
 {
@@ -357,7 +361,7 @@ void viscousFrictionForce(const UnsignedType& stepsCount, const Real& deltaT,
 }
 
 // Solver for a dinamic problem
-RealMatrix calculateDisplacementsDinamic
+RealMatrix MFE::calculateDisplacementsDinamic
 (const Real& time, const Real& deltaT,
 	RealMatrix& matrixStiffness, RealMatrix& matrixMass)
 {

@@ -1,6 +1,10 @@
 #include "solver_utils.h"
+#include "error_handling.h"
+#include "operator_overloading.h"
 
-Real getAmplitudeForce(const bool& isDriveForceDry)
+using namespace MFE;
+
+Real MFE::getAmplitudeForce(const bool& isDriveForceDry)
 {
 	Real amplitudeForce = 0.0;
 	if (isDriveForceDry)
@@ -29,7 +33,7 @@ Real getAmplitudeForce(const bool& isDriveForceDry)
 	return amplitudeForce;
 }
 
-Real getAveragePointsSpeed(RealVector speed)
+Real MFE::getAveragePointsSpeed(RealVector speed)
 {
 	UnsignedType sizeIndices = ACTIVE_INDICES.size();
 	if (sizeIndices == 0)
@@ -58,7 +62,7 @@ Real getAveragePointsSpeed(RealVector speed)
 	return averagePointsSpeed;
 }
 
-Real getCoeffDryFriction(const Real& coeffDryFrictionRest,
+Real MFE::getCoeffDryFriction(const Real& coeffDryFrictionRest,
 	const Real& coeffDryFrictionSliding, const Real averagePointsSpeed)
 {
 	Real coeffDryFriction = 0.0;
@@ -70,7 +74,7 @@ Real getCoeffDryFriction(const Real& coeffDryFrictionRest,
 	return coeffDryFriction;
 }
 
-Real getElasticForce(const RealVector& displacement,
+Real MFE::getElasticForce(const RealVector& displacement,
 	const RealMatrix& matrixStiffness)
 {
 	const UnsignedType qualityValues = matrixStiffness[0].size();
@@ -93,7 +97,7 @@ Real getElasticForce(const RealVector& displacement,
 	return elasticForce;
 }
 
-Real getFrequencyForce(const bool& isDriveForceDry)
+Real MFE::getFrequencyForce(const bool& isDriveForceDry)
 {
 	Real frequency = 0.0;
 	if (isDriveForceDry)
@@ -132,7 +136,7 @@ Real getFrequencyForce(const bool& isDriveForceDry)
 	return frequency;
 }
 
-UnsignedType getFrictionMode()
+UnsignedType MFE::getFrictionMode()
 {
 	UnsignedType choice = 0;
 	std::cout << "Input 1 || 2, || 3, where 1 is oscillations without \n"
@@ -145,7 +149,7 @@ UnsignedType getFrictionMode()
 	return choice;
 }
 
-Real getNodeLoad(const Real& amplitudeForce)
+Real MFE::getNodeLoad(const Real& amplitudeForce)
 {
 	UnsignedType sizeIndices = ACTIVE_INDICES.size();
 	if (sizeIndices == 0)
@@ -157,7 +161,7 @@ Real getNodeLoad(const Real& amplitudeForce)
 	return amplitudeForce / static_cast<Real>(sizeIndices);
 }
 
-Real getNormReaction(const bool& isDriveForce)
+Real MFE::getNormReaction(const bool& isDriveForce)
 {
 	Real normalReaction = 0.0;
 	static bool isGetNormal = false;
@@ -198,7 +202,7 @@ Real getNormReaction(const bool& isDriveForce)
 	return normalReaction;
 }
 
-Real getSignFrictionDrive(const Real& elasticForce,
+Real MFE::getSignFrictionDrive(const Real& elasticForce,
 	const Real& averagePointsSpeed, const Real& driveForce)
 {
 	Real signForce = 0.0;
@@ -218,7 +222,7 @@ Real getSignFrictionDrive(const Real& elasticForce,
 	return signForce;
 }
 
-Real getSignFrictionFree(const Real& elasticForce,
+Real MFE::getSignFrictionFree(const Real& elasticForce,
 	const Real& averagePointsSpeed)
 {
 	Real signForce = 0.0;
@@ -232,7 +236,7 @@ Real getSignFrictionFree(const Real& elasticForce,
 	return signForce;
 }
 
-Real getSumFrictionForce(const RealVector& force)
+Real MFE::getSumFrictionForce(const RealVector& force)
 {
 	const UnsignedType sizeForce = force.size();
 	Real sumForce = 0.0;
@@ -254,7 +258,7 @@ Real getSumFrictionForce(const RealVector& force)
 
 
 
-void setForceNormReaction(RealVector& force,
+void MFE::setForceNormReaction(RealVector& force,
 	const bool& isDriveForce)
 {
 	Real normalReaction = getNormReaction(isDriveForce);
@@ -274,7 +278,7 @@ void setForceNormReaction(RealVector& force,
 	}
 }
 
-void setForceDry(const Real& elasticForce,
+void MFE::setForceDry(const Real& elasticForce,
 	const Real& coeffDryFrictionRest,
 	const Real& coeffDryFrictionSliding, const Real averagePointsSpeed,
 	RealVector& force)
@@ -305,7 +309,7 @@ void setForceDry(const Real& elasticForce,
 	}
 }
 
-void setForceDriveDry(const Real& signForce,
+void MFE::setForceDriveDry(const Real& signForce,
 	const Real& coeffDryFrictionRest,
 	const Real& coeffDryFrictionSliding, const Real averagePointsSpeed,
 	const Real& driveForceNode, RealVector& force)
@@ -339,7 +343,7 @@ void setForceDriveDry(const Real& signForce,
 	}
 }
 
-void setForceViscous(const Real& nodeLoad, const Real& frequency,
+void MFE::setForceViscous(const Real& nodeLoad, const Real& frequency,
 	const Real& sumSteps, RealVector& force)
 {
 	const UnsignedType sizeForce = force.size();
@@ -358,7 +362,7 @@ void setForceViscous(const Real& nodeLoad, const Real& frequency,
 }
 
 
-bool isLowDriveElastic(const Real& elasticForce,
+bool MFE::isLowDriveElastic(const Real& elasticForce,
 	const Real& driveForceNode, const Real& frictionForce)
 {
 	UnsignedType sizeIndices = ACTIVE_INDICES.size();
@@ -367,7 +371,7 @@ bool isLowDriveElastic(const Real& elasticForce,
 		elasticForce) - abs(frictionForce) < -EPS);
 }
 
-bool isLowDriveForce(const Real& elasticForce,
+bool MFE::isLowDriveForce(const Real& elasticForce,
 	const Real& driveForceNode, const Real& frictionForce,
 	const Real& signForce)
 {
@@ -378,7 +382,7 @@ bool isLowDriveForce(const Real& elasticForce,
 		elasticForce * signForce >= 0.0;
 }
 
-bool isLowElasticForce(const Real& elasticForce,
+bool MFE::isLowElasticForce(const Real& elasticForce,
 	const Real& driveForceNode, const Real& frictionForce,
 	const Real& signForce)
 {
@@ -389,7 +393,7 @@ bool isLowElasticForce(const Real& elasticForce,
 		driveForceNode * signForce >= 0.0;
 }
 
-bool isLowSpeedElement(const Real& averagePointsSpeedOld,
+bool MFE::isLowSpeedElement(const Real& averagePointsSpeedOld,
 	const Real& averagePointsSpeed, const Real& averagePointsSpeedNew)
 {
 	return abs(averagePointsSpeed) < EPS &&
@@ -397,7 +401,7 @@ bool isLowSpeedElement(const Real& averagePointsSpeedOld,
 		abs(averagePointsSpeedNew) < EPS;
 }
 
-bool isOneWayElasticDrive(const Real& elasticForce,
+bool MFE::isOneWayElasticDrive(const Real& elasticForce,
 	const Real& driveForceNode, const Real& signForce)
 {
 	return driveForceNode * signForce <= 0.0 &&
