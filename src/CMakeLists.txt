@@ -6,9 +6,9 @@ set (HEADERS_PRIVATE
 )
 
 set (HEADERS_PUBLIC
-	${CMAKE_SOURCE_DIR}/inc/MFE_lib
-	${CMAKE_SOURCE_DIR}/inc/MFE_lib/functions_for_MFE/
-	${CMAKE_SOURCE_DIR}/inc/MFE_lib/types/
+	${CMAKE_SOURCE_DIR}/include/MFE_lib
+	${CMAKE_SOURCE_DIR}/include/MFE_lib/functions_for_MFE/
+	${CMAKE_SOURCE_DIR}/include/MFE_lib/types/
 )
 
 file (GLOB SOURCES_PRIVATE
