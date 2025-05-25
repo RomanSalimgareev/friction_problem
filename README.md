@@ -1,13 +1,13 @@
 friction_problem
 ================
 
-	A project for calculating the effect of all-round friction forces of various
+A project for calculating the effect of all-round friction forces of various
 kinds on a body.
 	
 Setting the task. 
 -----------------
 
-	The body is a parallelepiped that is located in a rectangular cross-sectional
+The body is a parallelepiped that is located in a rectangular cross-sectional
 tube (a simplified version of a piston in a cylinder).  To set the all-round dry
 friction, a condition is set for constant compression of the walls with the same
 force on the "cylinder". In the case of viscous friction, this condition does not
@@ -30,14 +30,14 @@ How to use the app?
 
 The main file code is stored in the apps folder under the name friction_main.cpp
 
-	1. You can change the parameters manually (y) or select the default values (n).
+1. You can change the parameters manually (y) or select the default values (n).
 By default, the modulus of elasticity, Poisson's ratio, and density are selected
 for aluminum, and the dimensions of the final element: length, width, and height
 are 10 centimeters, 6 centimeters, and 5 centimeters, respectively.
 
 	**Example of selection:**
 
-	```
+	```cpp
 	Do you want to enter the parameters manually? (y/n)
 	n
 	The parameters are selected by default:
@@ -49,13 +49,14 @@ are 10 centimeters, 6 centimeters, and 5 centimeters, respectively.
 	heigth = 0.05;
 	```
 
-	2. Next, you can set the initial displacements (y), or leave them zero (n).
+2. Next, you can set the initial displacements (y), or leave them zero (n).
 If you decide to set the initial movements, then you need to introduce an
 instant static load, which is distributed over the active degrees of freedom
 of the nodes of the front face of the final element (1, 2, 5 and 6).
 The load setting is necessary because the initial movements in the program
 are from a static problem for convenience.
-	(Active degrees of freedom are degrees of freedom that coincide with
+
+(Active degrees of freedom are degrees of freedom that coincide with
 the direction of movement of the body and are not fixed by symmetry conditions).
 
 	**Example of selection:**
@@ -107,7 +108,7 @@ the direction of movement of the body and are not fixed by symmetry conditions).
 		The value is set: 0.8
 		```
 
-	4. Next, you can choose the initial velocity and initial acceleration,
+4. Next, you can choose the initial velocity and initial acceleration,
 which are set for each active degree of freedom, rather than distributed
 over them.
 
@@ -123,7 +124,7 @@ over them.
 	The value is set: 0.7
 	```
 	
-	5. If you have selected problem type 2 or 3, then you can select the values
+5. If you have selected problem type 2 or 3, then you can select the values
 of the amplitude and frequency of the driving force by default, or enter
 them yourself. Moreover, for the frequency of the driving force, you must
 enter the coefficient before PI, and not the frequency value itself. 
@@ -148,7 +149,7 @@ enter the coefficient before PI, and not the frequency value itself.
 	The value is set: 100
 	```
 	
-	6. If you have selected task type 1 or 2, then you can choose the strength
+6. If you have selected task type 1 or 2, then you can choose the strength
 of the normal reaction to the nodes (by degrees of freedom directed to the
 walls of the pipe) by default, or set it yourself. This force simulates the
 counteraction of an all-round compressive force with the same value. It is 
@@ -194,8 +195,7 @@ My MFE_lib library describes the basic algorithms for solving.
 	
 	You can create matrices and interact with them:
 	
-		```
-		
+		```cpp
 		// Create a matrix without specifying the number of rows and columns
 		Matrix();
 
@@ -232,7 +232,7 @@ My MFE_lib library describes the basic algorithms for solving.
 	
 	Here are the functions for setting the initial kinematic boundary conditions:
 	
-		```
+		```cpp
 		// Oscillation time setting function
 		MFE_LIB_EXPORT Real inputTime();
 
@@ -269,7 +269,7 @@ My MFE_lib library describes the basic algorithms for solving.
 		
 		Mathematical functions and matrices that are used in the program:
 		
-		```
+		```cpp
 		// Matrix Cholesky
 		// The Cholesky matrix is obtained by decomposing a matrix of coefficients;
 		// in the case of the finite element method, it is a stiffness matrix.
@@ -372,7 +372,7 @@ My MFE_lib library describes the basic algorithms for solving.
 	
 		Functions for solving dynamic friction problems:
 	
-		```
+		```cpp
 		// Coefficients that are present in the displacement equations.
 		// These values ensure high accuracy and stability of the solution when
 		// using the Nmork method.
@@ -434,7 +434,7 @@ My MFE_lib library describes the basic algorithms for solving.
 		Functions for recording displacements and time in files displacements.txt
 		and time.txt:
 		
-		```
+		```cpp
 		//If it is not written to the file, the functions return false, otherwise true.
 		
 		// Writing to the file the displacements of nodes 1, 2, 5, 6 in the direction of 
@@ -469,7 +469,7 @@ My MFE_lib library describes the basic algorithms for solving.
 		Functions for obtaining displacements after solving from the
 		displacement matrix:
 		
-		```
+		```cpp
 		// Getting the displacements of nodes 1, 2, 5, 6 in the direction of 
 		// movement in a time step deltaT during time "time".
 		// rows is the number of rows of the displacement matrix, and displacements is
@@ -501,7 +501,8 @@ How to install
 --------------
 
 To install the app, you need to:
-	```
+
+	```cpp
 	# Clone my repository
 	git clone https://github.com/RomanSalimgareev/friction_problem
 	
