@@ -69,6 +69,7 @@ the direction of movement of the body and are not fixed by symmetry conditions).
 	The value is set: 10000
 	```
 
+
 	3. Then you can select the type of problem you need:
 	
 	**Example of selection:**
@@ -81,6 +82,8 @@ the direction of movement of the body and are not fixed by symmetry conditions).
 	1
 	The value is set: 1
 	```
+	
+	
 		1. **If problems 1 and 2 are selected:**
 		You will need to enter the coefficients of dry friction of
 		rest and dry friction of sliding.
@@ -96,6 +99,7 @@ the direction of movement of the body and are not fixed by symmetry conditions).
 		0.3
 		The value is set: 0.3
 		```
+		
 		
 		2. **If problem 3 are selected:**
 		You need to enter the coefficient of viscous friction.
@@ -168,7 +172,8 @@ set with the same value for each node.
 	```
 
 *Data output*
-	If everything is successful, the movements are output to a file
+
+If everything is successful, the movements are output to a file
 displacements.txt , which will be in your build directory,
 and the terminal will output:
 
