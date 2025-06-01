@@ -4,7 +4,7 @@
 // The class also has an overloaded operator [], which makes it possible to
 // both read and modify the matrix element.You can get the number of rows,
 // the number of columns from an object, delete a row, delete a column,
-// and check it for emptiness.
+// change the size of the matrix rows and check it for emptiness.
 
 #ifndef CLASS_MATRIX_H
 #define CLASS_MATRIX_H
@@ -36,6 +36,8 @@ namespace MFE
 		void eraseRow(const UnsignedType& index);
 
 		void eraseColumn(const UnsignedType& index);
+
+		void resizeRows(const UnsignedType& index);
 
 		bool empty() const;
 

@@ -88,6 +88,17 @@ void Matrix<T>::eraseColumn(const UnsignedType& index)
 }
 
 template <typename T>
+void Matrix<T>::resizeRows(const UnsignedType& index)
+{
+	if (m_matrix.empty())
+		ERROR(messageMatrixEmpty());
+	else
+	{
+		m_matrix.resize(index);
+	}
+}
+
+template <typename T>
 bool Matrix<T>::empty() const
 {
 	return m_matrix.empty();
