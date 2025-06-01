@@ -215,6 +215,7 @@ Examples of input data
 
 1. The problem of dry friction without a forcing force.
  
+	```
 	Default parameters:
 	modulus elastic = 7e+10;
 	poisson's ratio = 0.33;
@@ -240,6 +241,7 @@ Examples of input data
 	The initial speed: 0
 
 	The value of a normal reaction is 400
+	```
 
 	**Result:**
 
@@ -247,6 +249,7 @@ Examples of input data
 	
 2. The problem of dry friction with a driving force.
 
+	```
 	Do you want to enter the parameters manually? (y/n)
 	n
 	The parameters are selected by default:
@@ -283,6 +286,7 @@ Examples of input data
 	Amplitude: 300
 	
 	Normal reaction: 100
+	```
 	
 	**Result:**
 	
@@ -290,6 +294,7 @@ Examples of input data
 
 3. The problem of viscous friction with a driving force.
 
+	```
 	Do you want to enter the parameters manually? (y/n)
 	n
 	The parameters are selected by default:
@@ -322,6 +327,7 @@ Examples of input data
 	Frequency: 2 * PI
 
 	Amplitude: 220
+	```
 	
 	**Result:**
 	
