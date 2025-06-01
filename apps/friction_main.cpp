@@ -41,7 +41,7 @@ int main()
 
 	// As well as the oscillation time and time step (for numerical integration)
 	Real time = inputTime();
-	// Up to 1e-14
+	// For good convergence, it's worth taking 1e-7 or 1e-8.
 	Real deltaT = inputDeltaT();
 
 	try
@@ -61,10 +61,8 @@ int main()
 		// Writing to "displacements.txt"
 		writeDispSecondNode(displacements);
 
-		UnsignedType steps = static_cast<UnsignedType> (time / deltaT);
-
 		RealVector dispsSecondNode = getDispSecondNode(displacements);
-		RealVector stepsTime = getStepsTime(steps, deltaT);
+		RealVector stepsTime = getStepsTime(displacements.sizeRows(), deltaT);
 
 		plt::plot(stepsTime, dispsSecondNode);
 		plt::title("Displacements node");
