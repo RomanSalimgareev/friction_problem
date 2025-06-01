@@ -19,7 +19,8 @@ Real MFE::inputTime()
 Real MFE::inputDeltaT()
 {
 	Real deltaT = 0.0;
-	std::cout << "Enter the time step: \n";
+	std::cout << "Enter the time step \n" 
+			  << "(It is recommended to take the accuracy of 1e-7 or 1e-8): \n";
 	inputValue(deltaT);
 
 	return deltaT;
