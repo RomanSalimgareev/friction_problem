@@ -54,18 +54,18 @@ Real MFE::getAveragePointsSpeed(RealVector speed)
 	}
 
 	const UnsignedType sizeSpeed = speed.size();
+	const UnsignedType lastIndexActive = ACTIVE_INDICES.back();
 	Real sumSpeed = 0.0;
-	for (const auto& index : ACTIVE_INDICES)
+	if (sizeSpeed > lastIndexActive)
 	{
-		if (index < sizeSpeed)
+		for (const auto& index : ACTIVE_INDICES)
 			sumSpeed += speed[index];
-		else
-		{
-			std::string msg = messageOutOfRange();
-			ASSERT(index < sizeSpeed, msg);
-			WARNING(msg);
-			continue;
-		}
+	}
+	else
+	{
+		std::string msg = messageOutOfRange();
+		ASSERT(sizeSpeed > lastIndexActive, msg);
+		WARNING(msg);
 	}
 
 	Real averagePointsSpeed = sumSpeed / static_cast<Real> (sizeIndices);
@@ -88,19 +88,34 @@ Real MFE::getCoeffDryFriction(const Real& coeffDryFrictionRest,
 Real MFE::getElasticForceSum(const RealVector& displacement,
 	const RealMatrix& matrixStiffness)
 {
-	const UnsignedType qualityValues = matrixStiffness[0].size();
-	RealVector sumVectorStiffness(qualityValues, 0.0);
-	for (const auto& index : ACTIVE_INDICES)
+	if (ACTIVE_INDICES.size() == 0)
 	{
-		if (index < qualityValues)
+		std::string msg = "The size of the ACTIVE_INDICES is 0. ";
+		ERROR(msg);
+	}
+
+	UnsignedType qualityValues = 0;
+	if (matrixStiffness.sizeRows() != 0)
+		qualityValues = matrixStiffness.sizeRows();
+	else
+	{
+		std::string msg = "The size of the matrixStiffness is 0. ";
+		ERROR(msg);
+	}
+
+	const UnsignedType lastIndexActive = ACTIVE_INDICES.back();
+	RealVector sumVectorStiffness(qualityValues, 0.0);
+
+	if (qualityValues > lastIndexActive)
+	{
+		for (const auto& index : ACTIVE_INDICES)
 			sumVectorStiffness += matrixStiffness[index];
-		else
-		{
-			std::string msg = messageOutOfRange();
-			ASSERT(index < sizeSpeed, msg);
-			WARNING(msg);
-			continue;
-		}
+	}
+	else
+	{
+		std::string msg = messageOutOfRange();
+		ASSERT(qualityValues > lastIndexActive, msg);
+		WARNING(msg);
 	}
 
 	// The usual Coulomb Law
@@ -153,7 +168,7 @@ Real MFE::getFrequencyForce(const bool& isDriveForceDry)
 UnsignedType MFE::getFrictionMode()
 {
 	UnsignedType choice = 0;
-	std::cout << "Input 1 or 2, or 3, where 1 is a problem with dry friction \n"
+	std::cout << "Enter 1 or 2, or 3, where 1 is a problem with dry friction \n"
 		<< "without a driving force, 2 is a problem with dry friction with a \n"
 		<< "driving force, and 3 is a problem with viscous friction and \n"
 		<< "a driving force. \n";
@@ -264,6 +279,12 @@ Real MFE::getSumFrictionForce(const Real& signForce,
 	const Real& coeffDryFrictionRest, const Real& coeffDryFrictionSliding,
 	const Real& averagePointsSpeed, const bool& isDriveForce)
 {
+	if (ACTIVE_INDICES.size() == 0)
+	{
+		std::string msg = "The size of the ACTIVE_INDICES is 0. ";
+		ERROR(msg);
+	}
+
 	Real sumForce = 0.0;
 	Real coeffDryFriction = getCoeffDryFriction(coeffDryFrictionRest,
 		coeffDryFrictionSliding, averagePointsSpeed);
@@ -285,23 +306,68 @@ Real MFE::getSumFrictionForce(const Real& signForce,
 	return sumForce;
 }
 
+// The function of obtaining a stimulating force
+Real MFE::getResultantForce(const RealVector& force)
+{
+	if (ACTIVE_INDICES.size() == 0)
+	{
+		std::string msg = "The size of the ACTIVE_INDICES is 0. ";
+		ERROR(msg);
+	}
+
+	Real resultantForce = 0.0;
+	const UnsignedType lastIndexActive = ACTIVE_INDICES.back();
+	const UnsignedType sizeForce = force.size();
+	if (sizeForce > lastIndexActive)
+	{
+		for (const auto& index : ACTIVE_INDICES)
+			resultantForce += force[index];
+	}
+	else
+	{
+		std::string msg = messageOutOfRange();
+		ASSERT(sizeForce > lastIndexActive, msg);
+		WARNING(msg);
+	}
+
+	return resultantForce;
+}
+
 // Setting the elastic force by active degrees of freedom
 void MFE::setForceElastic(const RealVector& displacement,
 	const RealMatrix& matrixStiffness, RealVector& force)
 {
-	const UnsignedType qualityValues = matrixStiffness[0].size();
-	const UnsignedType forceSize = force.size();
-	for (const auto& index : ACTIVE_INDICES)
+	if (ACTIVE_INDICES.size() == 0)
 	{
-		if (index < qualityValues && index < forceSize)
+		std::string msg = "The size of the ACTIVE_INDICES is 0. ";
+		ERROR(msg);
+	}
+
+	UnsignedType qualityValues = 0;
+	if (matrixStiffness.sizeRows() != 0)
+		qualityValues = matrixStiffness.sizeRows();
+	else
+	{
+		std::string msg = "The size of the matrixStiffness is 0. ";
+		ERROR(msg);
+	}
+
+	const UnsignedType forceSize = force.size();
+	const UnsignedType lastIndexActive = ACTIVE_INDICES.back();
+
+	bool isIndicesCorrect = qualityValues > lastIndexActive &&
+		forceSize > lastIndexActive;
+
+	if (isIndicesCorrect)
+	{
+		for (const auto& index : ACTIVE_INDICES)
 			force[index] += -1.0 * matrixStiffness[index] * displacement;
-		else
-		{
-			std::string msg = messageOutOfRange();
-			ASSERT(index < sizeSpeed, msg);
-			WARNING(msg);
-			continue;
-		}
+	}
+	else
+	{
+		std::string msg = messageOutOfRange();
+		ASSERT(isIndicesCorrect > lastIndexActive, msg);
+		WARNING(msg);
 	}
 }
 
@@ -309,20 +375,26 @@ void MFE::setForceElastic(const RealVector& displacement,
 void MFE::setForceNormReaction(RealVector& force,
 	const bool& isDriveForce)
 {
-	Real normalReaction = getNormReaction(isDriveForce);
-
-	const UnsignedType sizeForce = force.size();
-	for (auto index : INDICES_NORMAL_REACTION_ACTIVE)
+	if (INDICES_NORMAL_REACTION_ACTIVE.size() == 0)
 	{
-		if (index < sizeForce)
+		std::string msg = "The size of the INDICES_NORMAL_REACTION_ACTIVE is 0.";
+		ERROR(msg);
+	}
+
+	Real normalReaction = getNormReaction(isDriveForce);
+	const UnsignedType sizeForce = force.size();
+	const UnsignedType lastIndexNormal = INDICES_NORMAL_REACTION_ACTIVE.back();
+
+	if (sizeForce > lastIndexNormal)
+	{
+		for (auto index : INDICES_NORMAL_REACTION_ACTIVE)
 			force[index] += -1.0 * normalReaction;
-		else
-		{
-			std::string msg = messageOutOfRange();
-			ASSERT(index < sizeForce, msg);
-			WARNING(msg);
-			continue;
-		}
+	}
+	else
+	{
+		std::string msg = messageOutOfRange();
+		ASSERT(sizeForce > lastIndexNormal, msg);
+		WARNING(msg);
 	}
 }
 
@@ -330,24 +402,31 @@ void MFE::setForceNormReaction(RealVector& force,
 // of dry friction without a driving force
 void MFE::setForceDry(const Real& frictionForceSum, RealVector& force)
 {
-	const UnsignedType sizeForce = force.size();
-	Real sizeCast = static_cast<Real>(ACTIVE_INDICES.size());
-	for (const auto& index : ACTIVE_INDICES)
+	UnsignedType sizeIndices = ACTIVE_INDICES.size();
+	if (sizeIndices == 0)
 	{
-		if (index < sizeForce)
+		std::string msg = "The size of the ACTIVE_INDICES is 0. ";
+		ERROR(msg);
+	}
+
+	const UnsignedType sizeForce = force.size();
+	const UnsignedType lastIndexActive = ACTIVE_INDICES.back();
+	Real sizeCast = static_cast<Real>(sizeIndices);
+	if (sizeForce > lastIndexActive)
+	{
+		for (const auto& index : ACTIVE_INDICES)
 		{
 			if (index == 1 || index == 4)
 				force[index] += frictionForceSum / sizeCast;
 			else if (index == 6)
 				force[index] += 2.0 * frictionForceSum / sizeCast;
 		}
-		else
-		{
-			std::string msg = messageOutOfRange();
-			ASSERT(index < sizeForce, msg);
-			WARNING(msg);
-			continue;
-		}
+	}
+	else
+	{
+		std::string msg = messageOutOfRange();
+		ASSERT(sizeForce > lastIndexActive, msg);
+		WARNING(msg);
 	}
 }
 
@@ -356,11 +435,20 @@ void MFE::setForceDry(const Real& frictionForceSum, RealVector& force)
 void MFE::setForceDriveDry(const Real& forceFrictionSum,
 	const Real& driveForceNode, RealVector& force)
 {
-	const UnsignedType sizeForce = force.size();
-	Real sizeCast = static_cast<Real>(ACTIVE_INDICES.size());
-	for (const auto& index : ACTIVE_INDICES)
+	UnsignedType sizeIndices = ACTIVE_INDICES.size();
+	if (sizeIndices == 0)
 	{
-		if (index < sizeForce)
+		std::string msg = "The size of the ACTIVE_INDICES is 0. ";
+		ERROR(msg);
+	}
+
+	const UnsignedType sizeForce = force.size();
+	const UnsignedType lastIndexActive = ACTIVE_INDICES.back();
+	Real sizeCast = static_cast<Real>(sizeIndices);
+
+	if (sizeForce > lastIndexActive)
+	{
+		for (const auto& index : ACTIVE_INDICES)
 		{
 			if (index == 0)
 				force[index] += driveForceNode;
@@ -371,13 +459,12 @@ void MFE::setForceDriveDry(const Real& forceFrictionSum,
 				force[index] += 2.0 * forceFrictionSum / sizeCast +
 				driveForceNode;
 		}
-		else
-		{
-			std::string msg = messageOutOfRange();
-			ASSERT(index < sizeForce, msg);
-			WARNING(msg);
-			continue;
-		}
+	}
+	else
+	{
+		std::string msg = messageOutOfRange();
+		ASSERT(sizeForce > lastIndexActive, msg);
+		WARNING(msg);
 	}
 }
 
@@ -386,18 +473,25 @@ void MFE::setForceDriveDry(const Real& forceFrictionSum,
 void MFE::setForceViscous(const Real& nodeLoad, const Real& frequency,
 	const Real& sumSteps, RealVector& force)
 {
-	const UnsignedType sizeForce = force.size();
-	for (const auto& index : ACTIVE_INDICES)
+	if (ACTIVE_INDICES.size() == 0)
 	{
-		if (index < sizeForce)
+		std::string msg = "The size of the ACTIVE_INDICES is 0. ";
+		ERROR(msg);
+	}
+
+	const UnsignedType sizeForce = force.size();
+	const UnsignedType lastIndexActive = ACTIVE_INDICES.back();
+
+	if (sizeForce > lastIndexActive)
+	{
+		for (const auto& index : ACTIVE_INDICES)
 			force[index] += nodeLoad * cos(frequency * sumSteps);
-		else
-		{
-			std::string msg = messageOutOfRange();
-			ASSERT(index < sizeForce, msg);
-			WARNING(msg);
-			continue;
-		}
+	}
+	else
+	{
+		std::string msg = messageOutOfRange();
+		ASSERT(sizeForce > lastIndexActive, msg);
+		WARNING(msg);
 	}
 }
 
@@ -406,6 +500,12 @@ bool MFE::isLowDriveElastic(const Real& elasticForce,
 	const Real& driveForceNode, const Real& frictionForce)
 {
 	UnsignedType sizeIndices = ACTIVE_INDICES.size();
+	if (sizeIndices == 0)
+	{
+		std::string msg = "The size of the ACTIVE_INDICES is 0. ";
+		ERROR(msg);
+	}
+
 	Real sizeCast = static_cast<Real> (sizeIndices);
 
 	bool condiditionSign = abs(sizeCast * driveForceNode +
@@ -421,6 +521,12 @@ bool MFE::isLowDriveForce(const Real& elasticForce,
 	const Real& signForce)
 {
 	UnsignedType sizeIndices = ACTIVE_INDICES.size();
+	if (sizeIndices == 0)
+	{
+		std::string msg = "The size of the ACTIVE_INDICES is 0. ";
+		ERROR(msg);
+	}
+
 	Real sizeCast = static_cast<Real> (sizeIndices);
 
 	bool condiditionSign = abs(sizeCast * driveForceNode) -
@@ -437,6 +543,12 @@ bool MFE::isLowElasticForce(const Real& elasticForce,
 	const Real& signForce)
 {
 	UnsignedType sizeIndices = ACTIVE_INDICES.size();
+	if (sizeIndices == 0)
+	{
+		std::string msg = "The size of the ACTIVE_INDICES is 0. ";
+		ERROR(msg);
+	}
+
 	Real sizeCast = static_cast<Real> (sizeIndices);
 
 	bool condiditionSign = abs(elasticForce) -
@@ -446,16 +558,4 @@ bool MFE::isLowElasticForce(const Real& elasticForce,
 		abs(elasticForce);
 
 	return condiditionSign && conditionLess;
-}
-
-bool MFE::isLowSpeedElement(const Real& averagePointsSpeedOld,
-	const Real& averagePointsSpeed)
-{
-	return abs(averagePointsSpeed) <= EPS && abs(averagePointsSpeedOld) <= EPS;
-}
-
-bool MFE::isOneWayElasticDrive(const Real& elasticForce,
-	const Real& driveForceNode)
-{
-	return driveForceNode * elasticForce >= 0.0;
 }

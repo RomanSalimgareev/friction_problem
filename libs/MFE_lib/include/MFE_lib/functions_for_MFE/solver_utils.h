@@ -82,6 +82,9 @@ namespace MFE
 		const Real& coeffDryFrictionRest, const Real& coeffDryFrictionSliding,
 		const Real& averagePointsSpeed, const bool& isDriveForce);
 	
+	// The function of obtaining a resultant force
+	MFE_LIB_EXPORT Real getResultantForce(const RealVector& force);
+
 	// Assignment to the vector of elastic forces
 	MFE_LIB_EXPORT void setForceElastic(const RealVector& displacement,
 		const RealMatrix& matrixStiffness, RealVector& force);
@@ -130,12 +133,18 @@ namespace MFE
 		const Real& signForce);
 
 	// Checking that the speed of the element is less than EPS
-	MFE_LIB_EXPORT bool isLowSpeedElement(const Real& averagePointsSpeedOld,
-		const Real& averagePointsSpeed);
+	MFE_LIB_EXPORT inline bool isLowSpeedElement(const Real& averagePointsSpeedOld,
+		const Real& averagePointsSpeed)
+	{
+		return abs(averagePointsSpeed) <= EPS && abs(averagePointsSpeedOld) <= EPS;
+	}
 
 	// Checking that the elastic force and the driving force are aligned
-	MFE_LIB_EXPORT bool isOneWayElasticDrive(const Real& elasticForce,
-		const Real& driveForceNode);
+	MFE_LIB_EXPORT inline bool isOneWayElasticDrive(const Real& elasticForce,
+		const Real& driveForceNode)
+	{
+		return driveForceNode * elasticForce >= 0.0;
+	}
 
 }
 
