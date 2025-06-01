@@ -210,6 +210,123 @@ friction_main.cpp in apps, "writeDispSecondNode(displacements)")
 A displacement graph will also be displayed, which will be in your build
 directory named graph.png.
 
+Examples of input data
+----------------------
+
+1. The problem of dry friction without a forcing force.
+ 
+	Default parameters:
+	modulus elastic = 7e+10;
+	poisson's ratio = 0.33;
+	dencity = 2700;
+	length = 0.1;
+	width = 0.06;
+	heigth = 0.05;
+
+	Oscillation time 0.05
+
+	Time step: 0.0000001
+
+	Initial static load: 30000
+
+	The problem of dry friction without a driving force : 1
+
+	Coefficient of dry friction at rest 0.5
+
+	Coefficient of dry friction at sliding 0.3
+
+	The initial acceleration: 0
+
+	The initial speed: 0
+
+	The value of a normal reaction is 400
+
+	**Result:**
+
+	![Exemple first problem](./share/images/Example_first_problem.png)
+	
+2. The problem of dry friction with a driving force.
+
+	Do you want to enter the parameters manually? (y/n)
+	n
+	The parameters are selected by default:
+	modulus elastic = 7e+10;
+	poisson's ratio = 0.33;
+	dencity = 2700;
+	length = 0.1;
+	width = 0.06;
+	heigth = 0.05;
+
+	Enter the oscillation time:
+	0.1
+	The value is set: 0.1
+
+	Enter the time step
+	(It is recommended to take the accuracy of 1e-7) :
+	0.0000001
+	The value is set: 1e-07
+
+	Initial static load: 0 (or n when selected) 
+
+	The problem of dry friction with a driving force: 2
+
+	Coefficient of dry friction at rest 0.5
+
+	Coefficient of dry friction at sliding 0.3
+
+	The initial acceleration: 0
+
+	The initial speed: 0
+
+	Frequency: 40 * PI
+
+	Amplitude: 300
+	
+	Normal reaction: 100
+	
+	**Result:**
+	
+	![Example second problem](./share/images/Example_second_problem.png)
+
+3. The problem of viscous friction with a driving force.
+
+	Do you want to enter the parameters manually? (y/n)
+	n
+	The parameters are selected by default:
+	modulus elastic = 7e+10;
+	poisson's ratio = 0.33;
+	dencity = 2700;
+	length = 0.1;
+	width = 0.06;
+	heigth = 0.05;
+
+	Enter the oscillation time:
+	0.1
+	The value is set: 0.1
+
+	Enter the time step
+	(It is recommended to take the accuracy of 1e-7) :
+	0.0000001
+	The value is set: 1e-07
+
+	Initial static load: 0 (or n when selected) 
+
+	The problem of dry friction with a driving force: 3
+
+	Coefficient viscous: 1.5
+
+	Initial acceleration: 0
+
+	Initial speed: 1
+
+	Frequency: 2 * PI
+
+	Amplitude: 220
+	
+	**Result:**
+	
+	![Example third problem](./share/images/Example_third_problem.png)
+
 Libraries used
 --------------
 
@@ -251,7 +368,10 @@ You can create matrices and interact with them:
 
 	// Deleting a column of the matrix
 	void eraseColumn(const UnsignedType& index);
-
+	
+	// Change the size of the matrix rows
+	void resizeRows(const UnsignedType& index);
+	
 	// Checking for the emptiness of the matrix
 	bool empty() const;
 	```
@@ -403,7 +523,7 @@ Functions for solving dynamic friction problems:
 	```cpp
 	// Coefficients that are present in the displacement equations.
 	// These values ensure high accuracy and stability of the solution when
-	// using the Nmork method.
+	// using the Newmark method.
 	constexpr Real ALPHA = 0.25;
 	constexpr Real DELTA = 0.5;
 
