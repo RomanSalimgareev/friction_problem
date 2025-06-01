@@ -32,8 +32,8 @@ void log(LogLevel level, const std::string& message)
 			break;
 		}
 
-		logFile << "[" << timestamp << "] : " << levelStr << "" <<
-			message << "\n\n";
+		logFile << "[" << timestamp << "] : " << levelStr << " : " 
+				<< message << "\n\n";
 	}
 }
 
