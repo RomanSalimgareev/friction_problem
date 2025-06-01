@@ -14,9 +14,12 @@ namespace MFE
 {
 	// Coefficients that are present in the displacement equations.
 	// These values ensure high accuracy and stability of the solution when using
-	// the Nmork method.
+	// the Newmark method.
 	constexpr Real ALPHA = 0.25;
 	constexpr Real DELTA = 0.5;
+
+	// Value for force limitation in case of inaccurate calculation
+	constexpr Real coeffLimitForce = 1e8;
 
 	// Applying symmetry conditions for a dinamic problem to a stiffness matrix,
 	// a mass matrix, a velocity vector, a displacement vector

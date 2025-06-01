@@ -7,7 +7,7 @@
 using namespace MFE;
 
 // Checking that the vector of initial accelerations is not zero for
-bool checkAccelInitialNoZero(const RealVector& accelerationOld)
+static bool checkAccelInitialNoZero(const RealVector& accelerationOld)
 {
 	const UnsignedType size = accelerationOld.size();
 	for (const auto& index : INDICES_INITIAL)
@@ -26,6 +26,31 @@ bool checkAccelInitialNoZero(const RealVector& accelerationOld)
 		}
 	}
 	return false;
+}
+
+// Checking for inaccuracy of calculations (if the values go to infinity)
+static bool checkInaccuracy(const Real& sumForce)
+{
+	static bool firstEntry = true;
+	static Real firstSumForce = 0;
+	if (firstEntry)
+	{
+		firstSumForce = sumForce;
+		firstEntry = false;
+	}
+
+	if (firstSumForce <= DBL_EPSILON)
+	{
+		if (sumForce >= coeffLimitForce)
+			return false;
+	}
+	else
+	{
+		if (sumForce >= firstSumForce * coeffLimitForce)
+			return false;
+	}
+
+	return true;
 }
 
 // Applying symmetry conditions to symmetry nodes for a dynamic problem
@@ -141,6 +166,19 @@ void MFE::dryFrictionFree(const UnsignedType& stepsCount, const Real& deltaT,
 		bool isFrictionGreater = abs(frictionForceSum) >= abs(elasticForceSum);
 		bool isLowSpeed = abs(averagePointsSpeed) <= EPS &&
 			abs(averagePointsSpeedOld) <= EPS;
+
+		Real resultantForce = getResultantForce(force);
+		bool isGoodResultantForce = checkInaccuracy(resultantForce);
+		if (!isGoodResultantForce)
+		{
+			std::string msgInaccuracy = "Inaccuracy of calculations or plastic output \n"
+				"(try changing the time step) \n\n";
+			std::cout << msgInaccuracy;
+
+			WARNING(msgInaccuracy);
+			displacements.resizeRows(step);
+			return;
+		}
 
 		if (isFrictionGreater && isLowSpeed && !accelInitialNoZero)
 		{
@@ -270,6 +308,17 @@ void MFE::forcedDryFriction(const UnsignedType& stepsCount, const Real& deltaT,
 		bool driveElasticCondition = driveElForceCondition &&
 			driveElSignCondition;
 
+		Real resultantForce = getResultantForce(force);
+		bool isGoodResultantForce = checkInaccuracy(resultantForce);
+		if (!isGoodResultantForce)
+		{
+			std::string msgInaccuracy = "Inaccuracy of calculations or plastic output \n"
+				"(try changing the time step) \n\n";
+			WARNING(msgInaccuracy);
+			displacements.resizeRows(step);
+			return;
+		}
+
 		if (lowSpeedCondition &&
 			(elasticForceCondition || driveForceCondition ||
 				driveElasticCondition) && !accelInitialNoZero)
@@ -362,6 +411,17 @@ void MFE::viscousFrictionForce(const UnsignedType& stepsCount, const Real& delta
 		Real alphaDt = ALPHA * deltaT;
 
 		setForceViscous(nodeLoad, frequency, sumSteps, force);
+
+		Real resultantForce = getResultantForce(force);
+		bool isGoodResultantForce = checkInaccuracy(resultantForce);
+		if (!isGoodResultantForce)
+		{
+			std::string msgInaccuracy = "Inaccuracy of calculations or plastic output \n"
+										"(try changing the time step) \n\n";
+			WARNING(msgInaccuracy);
+			displacements.resizeRows(step);
+			return;
+		}
 
 		RealVector dampingTerm = 
 			DELTA * coeffViscousfriction * displacements[step];
