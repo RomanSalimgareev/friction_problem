@@ -5,7 +5,7 @@
 
 using namespace MFE;
 
-std::string messageFuncNotCalculate()
+static std::string messageFuncNotCalculate()
 {
 	return "The function did not calculate the value";
 }

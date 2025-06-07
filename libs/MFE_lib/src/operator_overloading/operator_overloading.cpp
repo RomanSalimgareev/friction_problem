@@ -4,17 +4,17 @@
 
 using namespace MFE;
 
-std::string messageSizeFirstLess()
+static std::string messageSizeFirstLess()
 {
 	return "Vector size first < vector size second. ";
 }
 
-std::string messageSizeMatricestNotEqual()
+static std::string messageSizeMatricestNotEqual()
 {
 	return "The sizes of the matrices are not equal. ";
 }
 
-std::string messageSizeNotCompatible()
+static std::string messageSizeNotCompatible()
 {
 	return "The sizes of the matrices are are not compatible. ";
 }

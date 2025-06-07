@@ -14,7 +14,7 @@ namespace MFE
 	// Operators output
 	// The operator for matrix output
 	template <typename T>
-	std::ostream& operator << (std::ostream& out,
+	inline std::ostream& operator << (std::ostream& out,
 		const Matrix<T>& matrix)
 	{
 		const UnsignedType rows = matrix.sizeRows();
@@ -33,7 +33,7 @@ namespace MFE
 
 	// The operator for vector output
 	template <typename T>
-	std::ostream& operator <<(std::ostream& out,
+	inline std::ostream& operator <<(std::ostream& out,
 		const std::vector<T>& vectorOutput)
 	{
 		const UnsignedType size = vectorOutput.size();

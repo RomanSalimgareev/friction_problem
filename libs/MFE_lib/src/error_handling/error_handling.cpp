@@ -59,12 +59,12 @@ void warning(std::string msg, const char* file, const long& line)
 	log(LogLevel::WARNING, msg);
 }
 
-std::string messageOutOfRange()
+static std::string messageOutOfRange()
 {
 	return " Out of range. ";
 }
 
-std::string messageDivideZero()
+static std::string messageDivideZero()
 {
 	return " Dividing by zero. ";
 }

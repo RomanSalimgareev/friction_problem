@@ -11,7 +11,7 @@
 namespace MFE
 {
 	template <typename T>
-	void inputValue(T& value)
+	inline void inputValue(T& value)
 	{
 		while (true)
 		{

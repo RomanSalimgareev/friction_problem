@@ -29,9 +29,5 @@ void error(std::string msg, const char* file, const long& line);
 
 void warning(std::string msg, const char* file, const long& line);
 
-std::string messageOutOfRange();
-
-std::string messageDivideZero();
-
 #endif
 
