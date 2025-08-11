@@ -77,7 +77,7 @@ file(GLOB HEADERS_PUBLIC CONFIGURE_DEPENDS
 	include/*.hpp
 )
 
-file(GLOB_RECURSE SOURCES_PRIVATE CONFIGURE_DEPENDS
+file(GLOB SOURCES_FILES CONFIGURE_DEPENDS
 	src/math_functions.cpp
 	src/class_matrix.cpp
 	src/write_functions.cpp
@@ -90,7 +90,9 @@ file(GLOB_RECURSE SOURCES_PRIVATE CONFIGURE_DEPENDS
 
 target_sources(MFE_lib
 	PRIVATE
-		${SOURCES_PRIVATE}
+		${SOURCES_FILES}
+	PUBLIC
+		${HEADERS_PUBLIC}
 )
 
 target_include_directories(MFE_lib
