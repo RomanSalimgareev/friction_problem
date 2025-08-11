@@ -70,7 +70,7 @@ generate_export_header(MFE_lib EXPORT_FILE_NAME
 	${export_header_path}
 )
 
-set(HEADERS_PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+set(DIR_HEADERS_PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 set(HEADERS_PUBLIC 
 	${CMAKE_CURRENT_SOURCE_DIR}/include
