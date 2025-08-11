@@ -88,6 +88,11 @@ file(GLOB SOURCES_FILES CONFIGURE_DEPENDS
 	src/inputFunctions/*.cpp
 )
 
+source_group( 
+    TREE "${CMAKE_CURRENT_SOURCE_DIR}"
+	FILES ${SOURCES_FILES} ${HEADERS_PUBLIC}
+)
+
 target_sources(MFE_lib
 	PRIVATE
 		${SOURCES_FILES}
