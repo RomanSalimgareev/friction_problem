@@ -63,8 +63,11 @@ if(NOT BUILD_SHARED_LIBS)
 	set(export_file_name "export_static.h")
 endif()
 
+set(export_header_path 
+	${CMAKE_CURRENT_BINARY_DIR}/include/MFE_lib/${export_file_name}
+)
 generate_export_header(MFE_lib EXPORT_FILE_NAME 
-	${CMAKE_CURRENT_SOURCE_DIR}/include/MFE_lib/${export_file_name}
+	${export_header_path}
 )
 
 set(HEADERS_PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
