@@ -189,6 +189,11 @@ if(MFE_LIB_INSTALL AND NOT CMAKE_SKIP_INSTALL_RULES)
 		NAMESPACE MFE_lib::
 	)
 	
+	install(FILES ${export_header_path}
+		COMPONENT MFE_lib_dev
+		DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/MFE_lib"
+	)
+	
 	install(FILES
 		"${CMAKE_CURRENT_BINARY_DIR}/MFE_libConfig.cmake"
 		"${CMAKE_CURRENT_BINARY_DIR}/MFE_libConfig-version.cmake"
@@ -202,7 +207,7 @@ if(MFE_LIB_INSTALL AND NOT CMAKE_SKIP_INSTALL_RULES)
 		
 		if(BUILD_SHARED_LIBS)
 			set(pdb_file $<TARGET_PDB_FILE:MFE_lib>)
-			set(pdb_file_destination ${CMAKE_INSTALL_BINDIR})
+			set(pdb_file_destination ${CMAKE_INSTALL_BINDIR})	
 		else()
 			set(pdb_file 
 			"$<TARGET_FILE_DIR:MFE_lib>/"
