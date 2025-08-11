@@ -109,6 +109,10 @@ target_include_directories(MFE_lib
 		$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
+set_target_properties(MFE_lib PROPERTIES
+    PUBLIC_HEADER "${HEADERS_PUBLIC}"
+)
+	
 target_compile_definitions(MFE_lib
 	PUBLIC
 		"$<$<NOT:$<BOOL:${BUILD_SHARED_LIBS}>>:MFE_LIB_STATIC_DEFINE>"
